@@ -1,6 +1,6 @@
 # Rails 8 AI Agent Suite
 
-A collection of 18 specialized AI agents for Rails 8.1 development, for AI driven-development and follow TDD best practices.
+A collection of 18 specialized AI agents for modern Rails development, for AI driven-development and follow TDD best practices.
 
 Built using insights from [GitHub's analysis of 2,500+ agent.md files](https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/).
 
@@ -46,19 +46,6 @@ Most AI coding assistants treat Rails like any other framework. These agents und
 - **`@lint_agent`** - Fixes code style and formatting (no logic changes)
 - **`@security_agent`** - Audits security with Brakeman and Bundler Audit
 
-## Installation
-
-1. Copy the `.github/agents/` directory to your Rails project:
-
-```bash
-mkdir -p .github/agents
-cp -r agents/* .github/agents/
-```
-
-2. Ensure you have GitHub Copilot installed in VS Code or your preferred editor
-
-3. Use agents by mentioning them: `@model_agent create a User model with...`
-
 ## TDD Workflow Example
 
 Here's how to use the agents together for a new feature:
@@ -85,11 +72,11 @@ Here's how to use the agents together for a new feature:
 
 ## Agent Design Principles
 
-Each agent follows GitHub's best practices:
+Each agent follows best practices:
 
 ### ✅ What Makes These Agents Effective
 
-- **YAML Frontmatter**: Each agent has `name` and `description` for GitHub Copilot
+- **YAML Frontmatter**: Each agent has `name` and `description`
 - **Executable Commands**: Specific commands with flags (e.g., `bundle exec rspec spec/models/user_spec.rb:25`)
 - **Three-Tier Boundaries**:
   - ✅ **Always**: Things the agent must do
@@ -107,10 +94,10 @@ Each agent follows GitHub's best practices:
 
 ## Tech Stack
 
-These agents are optimized for the **Rails 8.1 Omakase** stack:
+These agents are optimized for the **Rails 8.x** stack:
 
 - Ruby 3.3+
-- Rails 8.1
+- Rails 8.x
 - PostgreSQL
 - Hotwire (Turbo + Stimulus)
 - ViewComponent
@@ -235,30 +222,6 @@ The agent will:
 2. Run RuboCop for style violations
 3. Check for SOLID principle violations
 4. Provide actionable feedback (no modifications)
-
-## File Structure
-
-```
-.github/agents/
-├── controller-agent.md
-├── feature-planner-agent.md
-├── form-agent.md
-├── job-agent.md
-├── lint-agent.md
-├── mailer-agent.md
-├── migration-agent.md
-├── model-agent.md
-├── policy-agent.md
-├── presenter-agent.md
-├── query-agent.md
-├── review-agent.md
-├── rspec-agent.md
-├── security-agent.md
-├── service-agent.md
-├── tdd-red-agent.md
-├── tdd-refactoring-agent.md
-└── view-component-agent.md
-```
 
 ## Contributing
 

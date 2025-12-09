@@ -42,12 +42,6 @@ You are an expert code reviewer specialized in Rails applications.
 - **Style JSON:** `bundle exec rubocop --format json` (machine-readable)
 - **Specific file style:** `bundle exec rubocop app/services/entities/create_service.rb`
 
-### Code Metrics
-
-- **Code complexity:** `bundle exec flog app/` (ABC complexity metric)
-- **Specific file complexity:** `bundle exec flog app/services/entities/create_service.rb`
-- **Code duplication:** `bundle exec flay app/` (detects similar code)
-
 ### Test Coverage
 
 - **Coverage report:** `COVERAGE=true bundle exec rspec` (generates SimpleCov report)
@@ -260,9 +254,6 @@ bin/bundler-audit
 
 # Style
 bundle exec rubocop
-
-# Complexity
-bundle exec flog app/
 ```
 
 ### Step 2: Read and Analyze Code
@@ -409,7 +400,6 @@ Use this checklist for comprehensive reviews:
 - [ ] **Security:** Run Brakeman, check for vulnerabilities
 - [ ] **Dependencies:** Run Bundler Audit for vulnerable gems
 - [ ] **Style:** Check RuboCop compliance
-- [ ] **Complexity:** Review Flog scores, identify complex methods
 - [ ] **Architecture:** Verify SOLID principles
 - [ ] **Rails Patterns:** Check for fat controllers/models
 - [ ] **Performance:** Look for N+1 queries, missing indexes

@@ -512,6 +512,10 @@ open coverage/index.html
 │    • @form_agent → complex forms                                │
 │    • @job_agent → background jobs                               │
 │    • @mailer_agent → email notifications                        │
+│    • @turbo_agent → Turbo (Frames, Streams, Drive)              │
+│    • @stimulus_agent → Stimulus controllers                     │
+│    • @presenter_agent → presenters/decorators                   │
+│    • @query_agent → complex database queries                    │
 ├─────────────────────────────────────────────────────────────────┤
 │                    🔵 REFACTOR PHASE                             │
 ├─────────────────────────────────────────────────────────────────┤

@@ -1,10 +1,11 @@
-# Rails AI Agent Suite
+# Rails AI Suite (Agents, Commands, Skills)
 
-A curated collection of specialized AI agents for Rails development, organized into three complementary approaches:
+A curated collection of specialized AI agents for Rails development, organized into four complementary components:
 
 1. **37signals Agents** - Inspired by DHH's "vanilla Rails" philosophy from the Fizzy codebase
 2. **Standard Rails Agents** - Modern Rails patterns with service objects, query objects, and presenters
 3. **Feature Specification Agents** - High-level planning and feature management
+4. **Skills Library** - Reusable knowledge modules for specific Rails patterns and technologies
 
 Built using insights from [GitHub's analysis of 2,500+ agent.md files](https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/) and [37signals' Fizzy codebase analysis](https://gist.github.com/marckohlbrugge/d363fb90c89f71bd0c816d24d7642aca).
 
@@ -15,6 +16,7 @@ Most AI coding assistants lack deep Rails context. This suite provides three dis
 - 🎯 **37signals Style**: Rich models, concerns, CRUD-everything approach
 - 🏗️ **Standard Rails**: Service objects, query objects, presenters, form objects
 - 📋 **Feature Planning**: Requirements analysis and implementation orchestration
+- 📚 **Skills Library**: Deep knowledge modules for Rails patterns and technologies
 
 Choose the style that fits your team's philosophy, or mix and match as needed.
 
@@ -240,6 +242,86 @@ High-level planning and orchestration for complex features.
 3. [Use recommended agents to implement]
 
 4. @feature_reviewer_agent verify implementation matches spec
+```
+
+---
+
+## Skills Library
+
+Reusable knowledge modules that provide deep context on specific Rails patterns and technologies. Skills are referenced by agents and can be used directly to provide comprehensive guidance.
+
+### What Are Skills?
+
+Skills are focused knowledge documents that contain:
+- **Patterns & best practices** - Proven approaches for specific domains
+- **Code examples** - Real-world implementations
+- **Reference materials** - Detailed documentation for complex topics
+- **Decision guidance** - When and how to use specific patterns
+
+### Available Skills
+
+#### Architecture & Patterns
+- **`rails-architecture`** - Code organization decisions, layered architecture
+- **`rails-concern`** - Shared behavior with concerns
+- **`rails-service-object`** - Business logic encapsulation
+- **`rails-query-object`** - Complex database queries
+- **`rails-presenter`** - View logic separation
+- **`rails-controller`** - RESTful controller patterns
+- **`rails-model-generator`** - Model creation with validations
+- **`form-object-patterns`** - Multi-model forms, wizards
+
+#### Frontend & Hotwire
+- **`hotwire-patterns`** - Turbo Frames, Turbo Streams, Stimulus integration
+- **`viewcomponent-patterns`** - Reusable UI components with ViewComponent
+
+#### Authentication & Authorization
+- **`authentication-flow`** - Rails 8 built-in authentication
+- **`authorization-pundit`** - Pundit policies and permissions
+
+#### Data & Storage
+- **`database-migrations`** - Safe, reversible migrations
+- **`active-storage-setup`** - File uploads and attachments
+- **`caching-strategies`** - Fragment, action, and HTTP caching
+
+#### Background Jobs & Real-time
+- **`solid-queue-setup`** - Background job processing
+- **`action-cable-patterns`** - WebSocket real-time features
+- **`action-mailer-patterns`** - Transactional emails
+
+#### API & Internationalization
+- **`api-versioning`** - Versioned REST APIs
+- **`i18n-patterns`** - Internationalization and localization
+
+#### Performance & Testing
+- **`performance-optimization`** - N+1 prevention, eager loading, optimization
+- **`tdd-cycle`** - Test-driven development workflow
+
+### Using Skills
+
+Skills provide context that agents can reference. Each skill includes:
+
+```
+skills/
+├── skill-name/
+│   ├── SKILL.md           # Main skill documentation
+│   └── reference/         # Optional detailed references
+│       ├── patterns.md
+│       └── examples.md
+```
+
+### Example: Architecture Decision
+
+The `rails-architecture` skill provides a decision tree for where code should live:
+
+```
+Where should this code go?
+├─ Complex business logic?      → Service Object
+├─ Complex database query?      → Query Object
+├─ View/display formatting?     → Presenter
+├─ Shared behavior across models? → Concern
+├─ Authorization logic?         → Policy
+├─ Reusable UI with logic?      → ViewComponent
+└─ Async/background work?       → Job
 ```
 
 ---

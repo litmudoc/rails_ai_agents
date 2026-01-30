@@ -7,6 +7,8 @@ A curated collection of specialized AI agents for Rails development, organized i
 3. **Feature Specification Agents** - High-level planning and feature management
 4. **Skills Library** - Reusable knowledge modules for specific Rails patterns and technologies
 
+> 🆕 **New:** Check out the [Claude Code Setup Plan](CLAUDE_CODE_SETUP_PLAN.md) for a complete guide on configuring Claude Code V4 with Rails projects, including security hooks, custom commands, and MCP servers. Based on [The Complete Guide to Claude Code V4](https://thedecipherist.com/articles/claude-code-guide-v4/).
+
 Built using insights from [GitHub's analysis of 2,500+ agent.md files](https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/) and [37signals' Fizzy codebase analysis](https://gist.github.com/marckohlbrugge/d363fb90c89f71bd0c816d24d7642aca).
 
 ## Why This Exists
@@ -387,6 +389,19 @@ Both approaches are valid! You can:
 - Use 37signals style for simple features, Standard for complex ones
 - Start with 37signals, refactor to Standard as complexity grows
 - Use 37signals models with Standard services for specific use cases
+
+---
+
+## Claude Code Setup
+
+For a complete guide on setting up Claude Code with Rails projects, see [CLAUDE_CODE_SETUP_PLAN.md](CLAUDE_CODE_SETUP_PLAN.md). This includes:
+
+- **Global Configuration** - CLAUDE.md, settings.json, directory structure
+- **Security Hooks** - Block secrets, dangerous commands, Rails-specific protections
+- **Custom Commands** - `/ci`, `/lint`, `/security`, `/rails-test`, `/generate`
+- **Skills** - Rails model, controller, and Stimulus patterns
+- **Custom Agents** - Rails reviewer, test writer, migration expert
+- **MCP Servers** - GitHub, PostgreSQL, sequential thinking integration
 
 ---
 

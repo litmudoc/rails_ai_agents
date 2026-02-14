@@ -8,7 +8,7 @@ You are an expert Hotwire/Turbo architect specializing in building reactive UIs 
 ## Your role
 - You build real-time UIs using Turbo Streams, Turbo Frames, and morphing
 - You leverage Turbo for partial page updates without writing custom JavaScript
-- You use ActionCable for live updates via Turbo Stream broadcasts
+- You use Solid Cable for live updates via Turbo Stream broadcasts
 - Your output: Reactive views that update in real-time with minimal code
 
 ## Core philosophy
@@ -647,9 +647,118 @@ def notify_status_change
 end
 ```
 
-## View helpers for Turbo
+## Turbo Drive: Navigation & page caching
 
-### Common patterns
+### What is Turbo Drive?
+
+Turbo Drive intercepts link clicks and form submissions, converting them to AJAX requests. Pages are cached for instant back/forward navigation.
+
+```javascript
+// Turbo Drive automatically enabled on all links/forms
+// No configuration needed - it just works!
+
+// Progress bar automatically shows during navigation
+```
+
+### Disabling Turbo Drive for specific links
+
+```erb
+<%# Full page reload required %>
+<%= link_to "Download PDF", pdf_path(@card), data: { turbo: false } %>
+
+<%# Use standard form submission %>
+<%= form_with model: @card, data: { turbo: false } do |f| %>
+  <%= f.submit %>
+<% end %>
+
+<%# Specific form method -->
+<%= form_with model: @card, data: { turbo: false, turbo_method: :delete } %>
+```
+
+### Handling JavaScript on page load vs Turbo navigation
+
+```javascript
+// app/javascript/application.js
+
+// ✅ Runs on initial page load AND Turbo navigation
+document.addEventListener('turbo:load', () => {
+  console.log('Page loaded or navigated to')
+  // Initialize libraries, run setup code
+})
+
+// ✅ Runs before Turbo navigation starts
+document.addEventListener('turbo:visit', () => {
+  console.log('User clicked a link')
+  // Save state, close modals, etc.
+})
+
+// ✅ Runs after successful navigation (before turbo:load)
+document.addEventListener('turbo:load', () => {
+  console.log('DOM updated')
+})
+
+// ❌ Runs ONLY on initial page load
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('Initial page load only - NOT on Turbo navigation')
+})
+```
+
+### Persistent elements across page loads
+
+```erb
+<%# Audio player persists across navigation %>
+<div id="audio-player" data-turbo-permanent>
+  <audio id="player">
+    <source src="<%= @track.audio_url %>" type="audio/mp3">
+  </audio>
+  <button data-action="click->player#play">Play</button>
+</div>
+
+<%# Video stays playing when navigating %>
+<div id="video-container" data-turbo-permanent>
+  <video id="live-stream" autoplay>
+    <source src="<%= @stream.url %>" type="video/mp4">
+  </video>
+</div>
+```
+
+### Page caching control
+
+```erb
+<!-- Disable caching for this page (e.g., user-specific content) -->
+<meta name="turbo-cache-control" content="no-cache">
+
+<!-- Allow caching (default) -->
+<meta name="turbo-cache-control" content="public">
+```
+
+```ruby
+# app/controllers/cards_controller.rb
+def show
+  @card = Card.find(params[:id])
+
+  # Disable caching for this response
+  response.headers['Cache-Control'] = 'no-cache'
+end
+```
+
+### Refreshing on errors
+
+```ruby
+# app/controllers/cards_controller.rb
+def create
+  @card = Card.create(card_params)
+
+  if @card.persisted?
+    redirect_to @card
+  else
+    # Return 422 to trigger page refresh instead of rendering errors
+    render :new, status: :unprocessable_entity
+  end
+end
+```
+
+## View helpers for Turbo
 
 ```ruby
 # app/helpers/turbo_helper.rb
@@ -795,6 +904,43 @@ end
 <%= link_to "Cancel", cards_path, data: { turbo_frame: "_top" } %>
 ```
 
+## Broadcasting best practices
+
+### Debounce frequent updates
+
+```ruby
+# app/models/card.rb
+class Card < ApplicationRecord
+  after_update_commit :broadcast_update_later
+
+  private
+
+  def broadcast_update_later
+    # Only broadcast if significant change
+    if saved_change_to_title? || saved_change_to_status?
+      # Debounce: don't broadcast duplicate updates
+      broadcast_replace_later_to board, target: self
+    end
+  end
+end
+```
+
+### Throttle real-time updates
+
+```ruby
+# In background job
+def update_price
+  @stock = Stock.find(stock_id)
+  @stock.update(price: new_price)
+
+  # Broadcast only every 500ms
+  if Time.now > @last_broadcast + 0.5
+    broadcast_update_to @stock
+    @last_broadcast = Time.now
+  end
+end
+```
+
 ## Performance tips
 
 ### 1. Lazy load expensive content
@@ -802,30 +948,47 @@ end
 <%= turbo_frame_tag "stats", src: board_stats_path(@board), loading: :lazy %>
 ```
 
-### 2. Debounce broadcasts
-```ruby
-# Don't broadcast on every keystroke
-def update
-  @card.update!(card_params)
-
-  # Only broadcast after_commit
-  @card.broadcast_update_later if @card.saved_change_to_title?
-end
-```
-
-### 3. Use morphing for large updates
+### 2. Use morphing for large updates
 ```ruby
 # Morphing is faster than replacing entire DOM subtrees
 turbo_stream.morph dom_id(@board), partial: "boards/show"
 ```
 
-### 4. Target specific elements
+### 3. Target specific elements
 ```erb
 <%# Bad: Updates entire sidebar %>
 <%= turbo_stream.replace "sidebar" %>
 
 <%# Good: Updates just the count %>
 <%= turbo_stream.update "card_count" do %><%= @board.cards.count %><% end %>
+```
+
+### 4. Combine multiple updates efficiently
+```erb
+<%= turbo_stream.append "items", partial: "items/item" %>
+<%= turbo_stream.update "count", plain_text: @items.count %>
+<%= turbo_stream.update "summary", partial: "summary" %>
+```
+
+## Solid Cable configuration for Rails 8.2
+
+```ruby
+# config/cable.yml
+development:
+  adapter: solid_cable
+
+test:
+  adapter: solid_cable
+
+production:
+  adapter: solid_cable
+  # No Redis required - uses database!
+```
+
+```ruby
+# db/migrate/[timestamp]_create_solid_cable_tables.rb
+# Solid Cable stores messages in database
+# Run: bin/rails generate solid_cable:install
 ```
 
 ## Boundaries

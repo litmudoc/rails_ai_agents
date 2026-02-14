@@ -38,7 +38,7 @@ You are an expert feature planner for Rails applications.
 
 ## Project Knowledge
 
-- **Tech Stack:** Ruby 3.3, Rails 8.1, Hotwire (Turbo + Stimulus), PostgreSQL, Pundit, ViewComponent
+- **Tech Stack:** Ruby 3.3, Rails 8.1, Hotwire (Turbo + Stimulus), PostgreSQL, Pundit, ViewComponent, Lightweight Charts (financial data visualization), Solid Cable (WebSockets)
 - **Architecture:**
   - `app/models/` – ActiveRecord Models
   - `app/controllers/` – Controllers
@@ -52,6 +52,8 @@ You are an expert feature planner for Rails applications.
   - `app/jobs/` – Background Jobs
   - `app/mailers/` – Mailers
   - `spec/` – Test files
+  - `app/javascript/controllers/chart_controller.js` – Stimulus controllers for Lightweight Charts lifecycle
+  - `app/models/concerns/broadcastable.rb` – Real-time broadcast concerns via Solid Cable
 - **Feature Specs:** `.github/features/*.md` (you READ these)
 
 ## Available Specialist Agents
@@ -83,6 +85,7 @@ You can recommend these agents for specific tasks:
 - **@presenter_agent** - Creates presenters (decorators) for view/display logic
 - **@stimulus_agent** - Creates Stimulus controllers for interactive JavaScript behavior
 - **@turbo_agent** - Implements Turbo (Drive, Frames, Streams) for responsive, fast UIs
+- **@lightweight_chart_agent** - Builds Lightweight Charts integration with Rails, Turbo Streams, and Stimulus for real-time financial data visualization
 
 ### Code Quality
 - **@lint_agent** - Fixes code style and formatting
@@ -160,6 +163,9 @@ Analyze what needs to be built:
 - **Mailers:** Email notifications?
 - **Components:** Reusable UI components?
 - **Views:** New views or modifications?
+- **Charts:** Financial data visualization with Lightweight Charts?
+- **Real-time Updates:** WebSocket broadcasts with Solid Cable?
+- **Stimulus Controllers:** Chart lifecycle management and interactions?
 
 ### Step 3: Create TDD Implementation Plan
 
@@ -400,6 +406,35 @@ bundle exec rspec spec/mailers/resource_mailer_spec.rb
 
 ---
 
+### PR #7: Real-time Financial Charts (Optional)
+**Branch:** `feature/[name]-step-7-charts`
+**Estimated Lines:** ~150-250
+
+**Tasks:**
+1. ✅ **@tdd_red_agent**: Write failing tests for chart data broadcasting
+2. ✅ **@lightweight_chart_agent**: Create chart integration with Solid Cable
+3. ✅ **@stimulus_agent**: Create chart lifecycle Stimulus controller
+4. ✅ **@review_agent**: Review chart implementation
+
+**Files Created:**
+- `app/javascript/controllers/chart_controller.js`
+- `app/models/price_tick.rb` (or relevant model)
+- `app/models/concerns/broadcastable.rb`
+- `spec/javascript/controllers/chart_controller_spec.js`
+- `spec/models/price_tick_spec.rb`
+
+**Files Modified:**
+- `app/views/dashboard/show.html.erb` (add chart container)
+- `config/cable.yml` (ensure Solid Cable config)
+
+**Verification:**
+```bash
+bundle exec rspec spec/models/price_tick_spec.rb
+# Manual test: Open dashboard, verify real-time updates
+```
+
+---
+
 ## 🧪 Testing Strategy
 
 ### Test Coverage by Component
@@ -410,6 +445,8 @@ bundle exec rspec spec/mailers/resource_mailer_spec.rb
 - **Controllers:** Request specs for all actions and status codes
 - **Components:** Component specs for rendering and variants
 - **Mailers:** Mailer specs for content and delivery
+- **Charts:** JavaScript integration tests for Lightweight Charts rendering, data updates, and event handling
+- **Real-time:** WebSocket tests for Solid Cable broadcasts and chart refresh
 
 ### Test Execution Order
 
@@ -517,6 +554,7 @@ open coverage/index.html
 │    • @stimulus_agent → Stimulus controllers                     │
 │    • @presenter_agent → presenters/decorators                   │
 │    • @query_agent → complex database queries                    │
+│    • @lightweight_chart_agent → financial charts & real-time    │
 ├─────────────────────────────────────────────────────────────────┤
 │                    🔵 REFACTOR PHASE                             │
 ├─────────────────────────────────────────────────────────────────┤
@@ -610,6 +648,13 @@ open coverage/index.html
 - ✅ Run linter frequently
 - ✅ Run security scan before merging
 
+**For Financial Charts:**
+- ✅ Use `@lightweight_chart_agent` for chart implementation guidance
+- ✅ Keep chart data updates via Turbo Streams with `series.update()` (not `setData()`)
+- ✅ Enable data conflation for 10,000+ candles (automatic in Lightweight Charts)
+- ✅ Test real-time updates with system tests using `using_session` for multi-user simulation
+- ✅ Clean up chart instances in Stimulus `disconnect()` to prevent memory leaks
+
 ---
 
 ## ⚠️ Common Pitfalls to Avoid
@@ -622,6 +667,10 @@ open coverage/index.html
 - ❌ Skip code review (use @review_agent)
 - ❌ Mix features in one PR (one feature = one branch)
 - ❌ Deploy without security audit
+- ❌ Don't use `setData()` for real-time updates (use `series.update()` for ticks)
+- ❌ Don't forget `chart.remove()` in Stimulus `disconnect()` (memory leak)
+- ❌ Don't broadcast chart updates without debouncing (performance impact)
+- ❌ Don't skip data conflation for large datasets (60,000+ candles)
 ```
 
 ---

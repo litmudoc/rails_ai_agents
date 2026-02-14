@@ -174,7 +174,7 @@ export default class extends Controller {
 </div>
 ```
 
-### Auto-dismiss controller (flash messages)
+## Pattern 2: Auto-dismiss controller (flash messages)
 
 ```javascript
 // app/javascript/controllers/auto_dismiss_controller.js
@@ -211,7 +211,7 @@ export default class extends Controller {
 </div>
 ```
 
-### Modal controller (dialogs)
+## Pattern 3: Modal controller (dialogs)
 
 ```javascript
 // app/javascript/controllers/modal_controller.js
@@ -264,7 +264,7 @@ export default class extends Controller {
 </div>
 ```
 
-### Dropdown controller
+## Pattern 4: Dropdown controller
 
 ```javascript
 // app/javascript/controllers/dropdown_controller.js
@@ -316,7 +316,7 @@ export default class extends Controller {
 </div>
 ```
 
-## Pattern 2: Form enhancement controllers
+## Pattern 5: Form enhancement controllers
 
 ### Auto-submit controller
 
@@ -430,21 +430,25 @@ export default class extends Controller {
   }
 
   #showError(input, message) {
-    const error = input.parentElement.querySelector(".error-message")
-      || this.#createErrorElement()
-
-    error.textContent = message
-    input.parentElement.appendChild(error)
+    let error = input.parentElement.querySelector(".error-message")
+    
+    if (!error) {
+      error = this.#createErrorElement(message)
+      input.parentElement.appendChild(error)
+    } else {
+      error.textContent = message
+    }
   }
 
   #clearError(input) {
     const error = input.parentElement.querySelector(".error-message")
-    error?.remove()
+    if (error) error.remove()
   }
 
-  #createErrorElement() {
+  #createErrorElement(message) {
     const div = document.createElement("div")
     div.className = "error-message"
+    div.textContent = message
     return div
   }
 }
@@ -452,177 +456,75 @@ export default class extends Controller {
 
 ```erb
 <%# Usage %>
-<%= form_with model: @card, data: { controller: "form-validation" } do |f| %>
-  <%= f.text_field :title,
-      required: true,
-      data: {
-        form_validation_target: "input",
-        action: "blur->form-validation#validate"
-      } %>
-
+<div data-controller="form-validation">
   <%= f.email_field :email,
-      required: true,
       data: {
         form_validation_target: "input",
         action: "blur->form-validation#validate"
       } %>
-<% end %>
+</div>
 ```
 
-## Pattern 3: Integration controllers
+## Pattern 6: Animation & transition controllers
 
-### Sortable controller (drag and drop)
+### Fade controller
 
 ```javascript
-// app/javascript/controllers/sortable_controller.js
+// app/javascript/controllers/fade_controller.js
 import { Controller } from "@hotwired/stimulus"
-import Sortable from "sortablejs"
 
 export default class extends Controller {
   static values = {
-    url: String,
-    animation: { type: Number, default: 150 }
+    duration: { type: Number, default: 300 }
   }
 
-  connect() {
-    this.sortable = Sortable.create(this.element, {
-      animation: this.animationValue,
-      onEnd: this.#end.bind(this)
+  fadeOut(event) {
+    event?.preventDefault()
+    
+    this.element.style.opacity = "1"
+    this.element.style.transition = `opacity ${this.durationValue}ms`
+    this.element.style.opacity = "0"
+
+    setTimeout(() => {
+      this.element.remove()
+    }, this.durationValue)
+  }
+
+  fadeIn() {
+    this.element.style.opacity = "0"
+    this.element.style.transition = `opacity ${this.durationValue}ms`
+    
+    requestAnimationFrame(() => {
+      this.element.style.opacity = "1"
     })
-  }
-
-  disconnect() {
-    this.sortable?.destroy()
-  }
-
-  #end(event) {
-    const id = event.item.dataset.id
-    const position = event.newIndex + 1
-
-    fetch(this.urlValue, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': this.#csrfToken
-      },
-      body: JSON.stringify({ id, position })
-    })
-  }
-
-  get #csrfToken() {
-    return document.querySelector('meta[name="csrf-token"]')?.content
   }
 }
 ```
 
 ```erb
 <%# Usage %>
-<div data-controller="sortable"
-     data-sortable-url-value="<%= reorder_cards_path %>">
-  <% @cards.each do |card| %>
-    <div data-id="<%= card.id %>">
-      <%= render card %>
-    </div>
-  <% end %>
+<div data-controller="fade" data-fade-duration-value="500">
+  <button data-action="fade#fadeOut">Delete (with fade)</button>
 </div>
 ```
 
-### Trix editor enhancements
+### Reveal on scroll controller
 
 ```javascript
-// app/javascript/controllers/trix_controller.js
+// app/javascript/controllers/reveal_controller.js
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["editor"]
-
-  connect() {
-    this.editorTarget.addEventListener("trix-file-accept", this.#preventFileUploads)
-  }
-
-  disconnect() {
-    this.editorTarget.removeEventListener("trix-file-accept", this.#preventFileUploads)
-  }
-
-  // Prevent file uploads (use direct upload instead)
-  #preventFileUploads(event) {
-    event.preventDefault()
-    alert("Please use the attachment button to upload files")
-  }
-
-  // Custom toolbar button behavior
-  addLink(event) {
-    event.preventDefault()
-
-    const url = prompt("Enter URL:")
-    if (url) {
-      this.editorTarget.editor.recordUndoEntry("Add Link")
-      this.editorTarget.editor.activateAttribute("href", url)
-    }
-  }
-}
-```
-
-## Pattern 4: Tracking and analytics controllers
-
-### Beacon controller (track views)
-
-```javascript
-// app/javascript/controllers/beacon_controller.js
-import { Controller } from "@hotwired/stimulus"
-
-export default class extends Controller {
+  static classes = ["revealed"]
   static values = {
-    url: String,
-    delay: { type: Number, default: 3000 }
-  }
-
-  connect() {
-    this.timeout = setTimeout(() => {
-      this.#send()
-    }, this.delayValue)
-  }
-
-  disconnect() {
-    clearTimeout(this.timeout)
-  }
-
-  #send() {
-    if (!this.hasUrlValue) return
-
-    navigator.sendBeacon(this.urlValue, JSON.stringify({
-      timestamp: new Date().toISOString()
-    }))
-  }
-}
-```
-
-```erb
-<%# Track card views after 3 seconds %>
-<div data-controller="beacon"
-     data-beacon-url-value="<%= card_reading_path(@card) %>">
-  <%= render @card %>
-</div>
-```
-
-### Visibility tracker controller
-
-```javascript
-// app/javascript/controllers/visibility_controller.js
-import { Controller } from "@hotwired/stimulus"
-
-export default class extends Controller {
-  static values = {
-    url: String,
-    threshold: { type: Number, default: 0.5 }
+    threshold: { type: Number, default: 0.1 }
   }
 
   connect() {
     this.observer = new IntersectionObserver(
-      this.#handleIntersection.bind(this),
+      entries => this.#handleIntersection(entries),
       { threshold: this.thresholdValue }
     )
-
     this.observer.observe(this.element)
   }
 
@@ -632,447 +534,747 @@ export default class extends Controller {
 
   #handleIntersection(entries) {
     entries.forEach(entry => {
-      if (entry.isIntersecting && !this.tracked) {
-        this.tracked = true
-        this.#track()
+      if (entry.isIntersecting) {
+        this.element.classList.add(this.revealedClass)
+        this.observer.unobserve(entry.target)
       }
-    })
-  }
-
-  #track() {
-    if (!this.hasUrlValue) return
-
-    fetch(this.urlValue, {
-      method: 'POST',
-      headers: {
-        'X-CSRF-Token': this.#csrfToken
-      }
-    })
-  }
-
-  get #csrfToken() {
-    return document.querySelector('meta[name="csrf-token"]')?.content
-  }
-}
-```
-
-## Pattern 5: Animation controllers
-
-### Slide-down controller
-
-```javascript
-// app/javascript/controllers/slide_down_controller.js
-import { Controller } from "@hotwired/stimulus"
-
-export default class extends Controller {
-  static values = {
-    duration: { type: Number, default: 300 }
-  }
-
-  connect() {
-    this.element.style.overflow = "hidden"
-    this.element.style.maxHeight = "0"
-
-    requestAnimationFrame(() => {
-      this.element.style.transition = `max-height ${this.durationValue}ms ease-out`
-      this.element.style.maxHeight = this.element.scrollHeight + "px"
-
-      setTimeout(() => {
-        this.element.style.maxHeight = ""
-        this.element.style.overflow = ""
-      }, this.durationValue)
     })
   }
 }
 ```
 
 ```erb
-<%# Animate new items %>
-<%= turbo_stream.prepend "comments" do %>
-  <div data-controller="slide-down">
-    <%= render @comment %>
-  </div>
-<% end %>
+<%# Usage - reveal on scroll -->
+<div data-controller="reveal" class="lazy-section">
+  <h2>This appears when scrolled into view</h2>
+</div>
 ```
 
-### Fade-in controller
+## Pattern 7: Domain-specific controllers
+
+### Sortable integration controller
 
 ```javascript
-// app/javascript/controllers/fade_in_controller.js
+// app/javascript/controllers/sortable_controller.js
+import { Controller } from "@hotwired/stimulus"
+import Sortable from "sortablejs"
+
+export default class extends Controller {
+  static values = { url: String }
+
+  connect() {
+    this.sortable = Sortable.create(this.element, {
+      animation: 150,
+      ghostClass: "sortable-ghost",
+      onEnd: (event) => this.#handleSort(event)
+    })
+  }
+
+  disconnect() {
+    this.sortable?.destroy()
+  }
+
+  #handleSort(event) {
+    const { oldIndex, newIndex, item } = event
+
+    fetch(this.urlValue, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": this.#csrfToken
+      },
+      body: JSON.stringify({
+        id: item.dataset.id,
+        position: newIndex
+      })
+    }).catch(error => console.error("Sort failed:", error))
+  }
+
+  #csrfToken() {
+    return document.querySelector('meta[name="csrf-token"]').content
+  }
+}
+```
+
+### Search filter controller
+
+```javascript
+// app/javascript/controllers/search_filter_controller.js
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static values = {
-    duration: { type: Number, default: 300 }
-  }
+  static targets = ["input", "item"]
+  static values = { minChars: { type: Number, default: 2 } }
 
-  connect() {
-    this.element.style.opacity = "0"
-    this.element.style.transition = `opacity ${this.durationValue}ms ease-in`
+  search(event) {
+    const query = event.target.value.toLowerCase()
 
-    requestAnimationFrame(() => {
-      this.element.style.opacity = "1"
+    if (query.length < this.minCharsValue) {
+      this.itemTargets.forEach(item => item.classList.remove("hidden"))
+      return
+    }
+
+    this.itemTargets.forEach(item => {
+      const text = item.textContent.toLowerCase()
+      item.classList.toggle("hidden", !text.includes(query))
     })
   }
 }
 ```
 
-## Pattern 6: Domain-specific controllers
+```erb
+<%# Usage %>
+<div data-controller="search-filter">
+  <input type="search" 
+         placeholder="Search..." 
+         data-search-filter-target="input"
+         data-action="input->search-filter#search">
 
-### Card drag-and-drop controller
+  <ul>
+    <% @items.each do |item| %>
+      <li data-search-filter-target="item"><%= item.name %></li>
+    <% end %>
+  </ul>
+</div>
+```
+
+## Memory management & cleanup
+
+### Critical: Preventing memory leaks
+
+Memory leaks occur when Stimulus controllers hold references to DOM elements or listeners that aren't properly cleaned up.
+
+### Problem patterns (❌ WRONG):
 
 ```javascript
-// app/javascript/controllers/card_drag_controller.js
-import { Controller } from "@hotwired/stimulus"
+// ❌ Global reference never cleared
+let globalElement = null
 
+export default class extends Controller {
+  connect() {
+    globalElement = this.element  // Persists after disconnect!
+  }
+}
+
+// ❌ Event listener without cleanup
+export default class extends Controller {
+  connect() {
+    document.addEventListener("click", () => this.handle())
+    // Never removed - accumulates with each controller instance!
+  }
+}
+
+// ❌ Timeout not cleared
+export default class extends Controller {
+  connect() {
+    setTimeout(() => { /* ... */ }, 1000)
+  }
+  // If controller disconnects before timeout fires, hangs in memory
+}
+
+// ❌ Interval never stopped
+export default class extends Controller {
+  connect() {
+    setInterval(() => { /* ... */ }, 500)
+  }
+  // Runs forever, even after controller removed!
+}
+```
+
+### Solution patterns (✅ CORRECT):
+
+```javascript
+// ✅ Store reference, clear in disconnect
+export default class extends Controller {
+  connect() {
+    this.element.addEventListener("custom-event", this.handle)
+  }
+
+  disconnect() {
+    this.element.removeEventListener("custom-event", this.handle)
+  }
+}
+
+// ✅ Use bound methods for cleanup
+export default class extends Controller {
+  connect() {
+    this.boundHandler = this.handle.bind(this)
+    document.addEventListener("click", this.boundHandler)
+  }
+
+  disconnect() {
+    document.removeEventListener("click", this.boundHandler)
+  }
+}
+
+// ✅ Always clear timeouts
+export default class extends Controller {
+  connect() {
+    this.timeout = setTimeout(() => this.doSomething(), 1000)
+  }
+
+  disconnect() {
+    clearTimeout(this.timeout)
+  }
+}
+
+// ✅ Always stop intervals
+export default class extends Controller {
+  connect() {
+    this.interval = setInterval(() => this.update(), 500)
+  }
+
+  disconnect() {
+    clearInterval(this.interval)
+  }
+}
+
+// ✅ Clean up observers
+export default class extends Controller {
+  connect() {
+    this.observer = new IntersectionObserver(entries => {
+      // Handle entries
+    })
+    this.observer.observe(this.element)
+  }
+
+  disconnect() {
+    this.observer?.disconnect()
+  }
+}
+
+// ✅ Abort controllers for fetch/requests
+export default class extends Controller {
+  connect() {
+    this.abortController = new AbortController()
+  }
+
+  async fetchData() {
+    const response = await fetch(this.url, {
+      signal: this.abortController.signal
+    })
+    return response.json()
+  }
+
+  disconnect() {
+    this.abortController?.abort()
+  }
+}
+```
+
+### Best practices for lifecycle:
+
+```javascript
+export default class extends Controller {
+  static targets = ["button"]
+  static values = { delay: Number }
+
+  connect() {
+    // Perform initialization
+    // Attach event listeners
+    // Start timers/intervals
+    // Set up observers
+
+    // Always store references for cleanup
+    this.boundClick = this.handleClick.bind(this)
+    this.element.addEventListener("click", this.boundClick)
+
+    this.timeout = setTimeout(() => {
+      this.initialize()
+    }, this.delayValue)
+  }
+
+  disconnect() {
+    // CRITICAL: Clean up in reverse order
+    // Stop timers/intervals
+    clearTimeout(this.timeout)
+    clearInterval(this.interval)
+
+    // Remove event listeners
+    this.element.removeEventListener("click", this.boundClick)
+    document.removeEventListener("custom", this.boundCustom)
+
+    // Disconnect observers
+    this.observer?.disconnect()
+    this.mutationObserver?.disconnect()
+
+    // Abort pending requests
+    this.abortController?.abort()
+
+    // Clear references
+    this.element = null
+    this.boundClick = null
+  }
+
+  handleClick(event) {
+    // Event handler code
+  }
+}
+```
+
+## Stimulus 3.2 features & patterns
+
+### Dispatching custom events
+
+```javascript
+// app/javascript/controllers/form_controller.js
+export default class extends Controller {
+  static targets = ["input"]
+
+  submit(event) {
+    event.preventDefault()
+
+    // Dispatch custom event with detail
+    this.dispatch("submit", {
+      detail: {
+        value: this.inputTarget.value,
+        timestamp: Date.now()
+      }
+    })
+  }
+}
+```
+
+```javascript
+// app/javascript/controllers/parent_controller.js
+export default class extends Controller {
+  connect() {
+    // Listen for custom event from child
+    this.element.addEventListener("form:submit", (event) => {
+      console.log("Form submitted:", event.detail)
+    })
+  }
+}
+```
+
+### Value types: Complete reference
+
+```javascript
+// app/javascript/controllers/config_controller.js
+export default class extends Controller {
+  static values = {
+    // String
+    apiKey: String,
+    endpoint: { type: String, default: "/api" },
+
+    // Number
+    timeout: Number,
+    retries: { type: Number, default: 3 },
+
+    // Boolean
+    debug: Boolean,
+    enabled: { type: Boolean, default: true },
+
+    // Array
+    tags: Array,
+    ids: { type: Array, default: [] },
+
+    // Object (JSON)
+    config: Object,
+    metadata: { type: Object, default: {} },
+
+    // Check if value exists
+    // Use: this.hasApiKeyValue
+  }
+
+  connect() {
+    console.log(this.apiKeyValue)      // String
+    console.log(this.timeoutValue)     // Number
+    console.log(this.debugValue)       // Boolean
+    console.log(this.tagsValue)        // Array
+    console.log(this.configValue)      // Object
+  }
+}
+```
+
+```erb
+<%# Usage in HTML %>
+<div data-controller="config"
+     data-config-api-key-value="abc123"
+     data-config-timeout-value="5000"
+     data-config-debug-value="true"
+     data-config-tags-value='["urgent", "bug"]'
+     data-config-metadata-value='{"user_id": 42}'>
+</div>
+```
+
+### Reactive values with value callbacks
+
+```javascript
+// app/javascript/controllers/reactive_controller.js
+export default class extends Controller {
+  static values = {
+    theme: String,
+    count: { type: Number, default: 0 }
+  }
+
+  themeValueChanged(value, previousValue) {
+    console.log(`Theme changed from ${previousValue} to ${value}`)
+    
+    // React to value change
+    this.element.classList.remove(`theme-${previousValue}`)
+    this.element.classList.add(`theme-${value}`)
+  }
+
+  countValueChanged(value) {
+    console.log(`Count is now ${value}`)
+    this.element.textContent = `Count: ${value}`
+  }
+}
+```
+
+### Working with element collections
+
+```javascript
+// app/javascript/controllers/card_list_controller.js
 export default class extends Controller {
   static targets = ["card"]
 
-  dragStart(event) {
-    event.dataTransfer.effectAllowed = "move"
-    event.dataTransfer.setData("text/plain", event.target.dataset.cardId)
-    event.target.classList.add("dragging")
+  // Accessors
+  connect() {
+    console.log(this.cardTarget)      // First target
+    console.log(this.cardTargets)     // Array of all targets
+    console.log(this.hasCardTarget)   // Boolean check
   }
 
-  dragEnd(event) {
-    event.target.classList.remove("dragging")
-  }
-
-  dragOver(event) {
-    event.preventDefault()
-    event.dataTransfer.dropEffect = "move"
-  }
-
-  drop(event) {
-    event.preventDefault()
-
-    const cardId = event.dataTransfer.getData("text/plain")
-    const columnId = event.target.closest("[data-column-id]").dataset.columnId
-
-    this.#moveCard(cardId, columnId)
-  }
-
-  #moveCard(cardId, columnId) {
-    fetch(`/cards/${cardId}/move`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': this.#csrfToken
-      },
-      body: JSON.stringify({ column_id: columnId })
+  removeAll() {
+    this.cardTargets.forEach(card => {
+      card.remove()
     })
   }
 
-  get #csrfToken() {
-    return document.querySelector('meta[name="csrf-token"]')?.content
+  // Target added/removed callbacks (3.2+)
+  cardTargetConnected(element) {
+    console.log("Card added:", element)
+  }
+
+  cardTargetDisconnected(element) {
+    console.log("Card removed:", element)
   }
 }
 ```
 
-### Filter controller
+### Combining multiple targets
 
 ```javascript
-// app/javascript/controllers/filter_controller.js
+export default class extends Controller {
+  static targets = ["title", "description", "submit"]
+  static classes = ["active", "loading"]
+
+  connect() {
+    // Multiple targets
+    console.log(this.titleTarget)
+    console.log(this.descriptionTargets)
+    console.log(this.submitTarget)
+
+    // Classes available immediately
+    this.element.classList.add(this.activeClass)
+  }
+
+  enable() {
+    this.titleTarget.disabled = false
+    this.descriptionTarget.disabled = false
+    this.submitTarget.disabled = false
+  }
+
+  disable() {
+    this.titleTarget.disabled = true
+    this.descriptionTarget.disabled = true
+    this.submitTarget.disabled = true
+  }
+}
+```
+
+### Action descriptors (3.2 feature)
+
+```javascript
+// Modern syntax - action parameters in HTML
+export default class extends Controller {
+  update(event) {
+    // Can receive event object
+    console.log(event)
+  }
+}
+```
+
+```erb
+<%# Action with arguments (3.2+) %>
+<div data-controller="example">
+  <button data-action="example#update">Update</button>
+  <button data-action="click->example#update">Also works</button>
+  <input data-action="input->example#update">
+</div>
+```
+
+### Module composition pattern
+
+```javascript
+// app/javascript/controllers/concerns/validatable.js
+export default {
+  validate() {
+    return this.#isValid()
+  },
+
+  #isValid() {
+    return this.element.checkValidity()
+  }
+}
+
+// app/javascript/controllers/form_controller.js
 import { Controller } from "@hotwired/stimulus"
+import validatable from "./concerns/validatable"
 
-export default class extends Controller {
-  static targets = ["item"]
-  static values = {
-    query: String
-  }
-
-  filter(event) {
-    this.queryValue = event.target.value.toLowerCase()
-    this.#updateVisibility()
-  }
-
-  clear() {
-    this.queryValue = ""
-    this.#updateVisibility()
-  }
-
-  #updateVisibility() {
-    this.itemTargets.forEach(item => {
-      const text = item.textContent.toLowerCase()
-      const matches = text.includes(this.queryValue)
-
-      item.hidden = !matches
-    })
-  }
-}
-```
-
-```erb
-<%# Client-side filtering %>
-<div data-controller="filter">
-  <input type="search"
-         placeholder="Filter cards..."
-         data-action="input->filter#filter">
-
-  <div>
-    <% @cards.each do |card| %>
-      <div data-filter-target="item">
-        <%= card.title %>
-      </div>
-    <% end %>
-  </div>
-</div>
-```
-
-## Controller composition patterns
-
-### Multiple controllers on one element
-
-```erb
-<div data-controller="dropdown modal">
-  <%# Both controllers active %>
-</div>
-```
-
-### Nested controllers
-
-```erb
-<div data-controller="sortable">
-  <div data-controller="card">
-    <div data-controller="dropdown">
-      <%# Three controllers in hierarchy %>
-    </div>
-  </div>
-</div>
-```
-
-### Controller communication via events
-
-```javascript
-// app/javascript/controllers/publisher_controller.js
-export default class extends Controller {
-  publish() {
-    this.dispatch("published", { detail: { content: "data" } })
-  }
-}
-
-// app/javascript/controllers/subscriber_controller.js
 export default class extends Controller {
   connect() {
-    this.element.addEventListener("publisher:published", this.#handleEvent)
+    if (!this.validate()) {
+      console.error("Form invalid")
+    }
   }
 
-  #handleEvent(event) {
-    console.log("Received:", event.detail.content)
+  // Mixin methods available
+  // this.validate()
+}
+
+Object.assign(FormController.prototype, validatable)
+```
+
+## Common Stimulus patterns catalog
+
+### 1. Conditional display
+```erb
+<div data-controller="toggle">
+  <button data-action="toggle#toggle" data-toggle-target="button">Show/Hide</button>
+  <div data-toggle-target="toggleable" class="hidden">Content</div>
+</div>
+```
+
+### 2. Debounced search
+```javascript
+export default class extends Controller {
+  search() {
+    clearTimeout(this.searchTimeout)
+    this.searchTimeout = setTimeout(() => {
+      this.#performSearch()
+    }, 300)
+  }
+
+  disconnect() {
+    clearTimeout(this.searchTimeout)
   }
 }
 ```
 
-```erb
-<div data-controller="subscriber">
-  <div data-controller="publisher"
-       data-action="publisher:published->subscriber#handleEvent">
-    <button data-action="publisher#publish">Publish</button>
-  </div>
-</div>
+### 3. Form submission with validation
+```javascript
+export default class extends Controller {
+  static targets = ["form", "error"]
+
+  submit(event) {
+    event.preventDefault()
+
+    if (this.formTarget.checkValidity()) {
+      this.formTarget.requestSubmit()
+    } else {
+      this.errorTarget.textContent = "Please fill all required fields"
+    }
+  }
+}
+```
+
+### 4. Tab switching
+```javascript
+export default class extends Controller {
+  static targets = ["tab", "panel"]
+
+  selectTab(event) {
+    const tab = event.target
+    const panelId = tab.getAttribute("aria-controls")
+
+    // Deactivate all
+    this.tabTargets.forEach(t => t.setAttribute("aria-selected", "false"))
+    this.panelTargets.forEach(p => p.hidden = true)
+
+    // Activate selected
+    tab.setAttribute("aria-selected", "true")
+    document.getElementById(panelId).hidden = false
+  }
+}
+```
+
+### 5. Lazy loading images
+```javascript
+export default class extends Controller {
+  static values = { src: String }
+
+  connect() {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        this.element.src = this.srcValue
+        observer.disconnect()
+      }
+    })
+    observer.observe(this.element)
+  }
+}
 ```
 
 ## Testing Stimulus controllers
 
-### System tests
-
-```ruby
-# test/system/cards_test.rb
-class CardsTest < ApplicationSystemTestCase
-  test "toggle card details" do
-    visit card_path(cards(:logo))
-
-    assert_no_selector ".card__details"
-
-    click_button "Show Details"
-
-    assert_selector ".card__details"
-  end
-
-  test "copy to clipboard" do
-    visit card_path(cards(:logo))
-
-    click_button "Copy Link"
-
-    assert_text "Copied!"
-  end
-end
-```
-
-### JavaScript tests (optional)
+### Unit tests with Jest
 
 ```javascript
 // test/javascript/controllers/toggle_controller.test.js
 import { Application } from "@hotwired/stimulus"
-import ToggleController from "../../app/javascript/controllers/toggle_controller"
+import ToggleController from "controllers/toggle_controller"
 
 describe("ToggleController", () => {
-  let application
+  let application, controller
 
   beforeEach(() => {
     application = Application.start()
     application.register("toggle", ToggleController)
 
-    document.body.innerHTML = `
+    const html = `
       <div data-controller="toggle">
         <button data-action="toggle#toggle">Toggle</button>
-        <div data-toggle-target="toggleable" class="hidden">Content</div>
+        <div data-toggle-target="toggleable">Content</div>
       </div>
     `
+    document.body.innerHTML = html
+    controller = application.controllers[0]
   })
 
-  it("toggles visibility", () => {
-    const button = document.querySelector("button")
-    const content = document.querySelector("[data-toggle-target='toggleable']")
+  test("toggles element class", () => {
+    const element = document.querySelector('[data-toggle-target="toggleable"]')
+    
+    controller.toggle({ preventDefault: () => {} })
+    expect(element.classList.contains("hidden")).toBe(true)
+    
+    controller.toggle({ preventDefault: () => {} })
+    expect(element.classList.contains("hidden")).toBe(false)
+  })
 
-    expect(content.classList.contains("hidden")).toBe(true)
-
-    button.click()
-
-    expect(content.classList.contains("hidden")).toBe(false)
+  afterEach(() => {
+    application.stop()
   })
 })
 ```
 
-## Stimulus naming conventions
+### System tests with Rails
 
-### Controller names
-- Kebab-case in HTML: `data-controller="auto-submit"`
-- Snake_case in filename: `auto_submit_controller.js`
-- PascalCase in class: `AutoSubmitController`
+```ruby
+# test/system/toggle_test.rb
+require "application_system_test_case"
 
-### Targets
-- camelCase: `data-[controller]-target="menuItem"`
-- Access: `this.menuItemTarget` or `this.menuItemTargets`
+class ToggleTest < ApplicationSystemTestCase
+  test "toggles visibility" do
+    visit page_with_toggle_path
 
-### Values
-- camelCase: `data-[controller]-url-value="/path"`
-- Access: `this.urlValue`
+    assert_selector "[data-toggle-target='toggleable']", visible: false
 
-### Classes
-- camelCase: `data-[controller]-active-class="is-active"`
-- Access: `this.activeClass`
+    click_button "Toggle"
+    assert_selector "[data-toggle-target='toggleable']", visible: true
 
-## Common Stimulus patterns catalog
-
-### 1. Toggle class
-```javascript
-toggle() {
-  this.element.classList.toggle(this.activeClass)
-}
+    click_button "Toggle"
+    assert_selector "[data-toggle-target='toggleable']", visible: false
+  end
+end
 ```
 
-### 2. Show on hover
-```javascript
-show() {
-  this.element.classList.remove(this.hiddenClass)
-}
+## Stimulus 3.2 best practices
 
-hide() {
-  this.element.classList.add(this.hiddenClass)
-}
+### DO:
+- ✅ Keep controllers small (< 100 lines)
+- ✅ Use data attributes for configuration
+- ✅ Dispatch custom events for inter-controller communication
+- ✅ Clean up in `disconnect()` method
+- ✅ Use private methods (#) for internal logic
+- ✅ Leverage Turbo for navigation, not Stimulus
+- ✅ Write progressive enhancements
+- ✅ Test controllers in isolation
+
+### DON'T:
+- ❌ Put business logic in controllers
+- ❌ Use controllers for routing/navigation
+- ❌ Store application state in controllers
+- ❌ Forget to clean up event listeners
+- ❌ Use global variables
+- ❌ Mix multiple responsibilities in one controller
+- ❌ Ignore memory leaks from timers/observers
+- ❌ Replace server-rendered HTML with client-side rendering
+
+## Stimulus troubleshooting
+
+### Controller not connecting
+
+```javascript
+// ❌ Problem: No error, but controller.connect() never called
+// Solution: Check data-controller attribute matches filename
+
+// ✅ File: app/javascript/controllers/example_controller.js
+// ✅ HTML: <div data-controller="example">
+
+// ❌ Won't work: data-controller="exampleController"
+// ❌ Won't work: data-controller="Example"
 ```
 
-### 3. Disable button on submit
+### Targets not found
+
 ```javascript
-submit() {
-  this.submitTarget.disabled = true
-  this.element.requestSubmit()
+// ❌ Problem: this.buttonTarget is undefined
+// Solution: Verify targets declared and HTML matches
+
+export default class extends Controller {
+  static targets = ["button"]  // declared
+
+  connect() {
+    console.log(this.buttonTarget)  // must exist in HTML
+  }
 }
+
+// ✅ HTML must have: data-[controller]-target="button"
+// ✅ <button data-example-target="button">Click</button>
 ```
 
-### 4. Confirm action
+### Values not updating
+
 ```javascript
-confirm(event) {
-  if (!window.confirm("Are you sure?")) {
-    event.preventDefault()
+// ❌ Problem: Value change not reflected
+// Solution: Use valueChanged callback or watch for changes
+
+export default class extends Controller {
+  static values = { count: Number }
+
+  // Automatic callback when value changes (3.2+)
+  countValueChanged(value) {
+    console.log("Count is now:", value)
+  }
+
+  updateCount() {
+    // Change via dispatch from HTML
+    this.dispatch("updateCount", { detail: { count: 42 } })
   }
 }
 ```
 
-### 5. Prevent default
+### Memory leaks detected
+
 ```javascript
-prevent(event) {
-  event.preventDefault()
-}
-```
+// ❌ Problem: DevTools shows detached DOM nodes
+// Solution: Always disconnect observers/listeners
 
-## Reusable controller library
-
-The approach creates a library of generic controllers:
-
-**UI controllers:**
-- `toggle_controller` - Show/hide elements
-- `dropdown_controller` - Dropdown menus
-- `modal_controller` - Dialog boxes
-- `tabs_controller` - Tab navigation
-- `tooltip_controller` - Tooltips
-
-**Form controllers:**
-- `auto_submit_controller` - Auto-submit forms
-- `character_counter_controller` - Character counting
-- `form_validation_controller` - Validation UI
-- `password_visibility_controller` - Show/hide password
-
-**Utility controllers:**
-- `clipboard_controller` - Copy to clipboard
-- `auto_dismiss_controller` - Auto-remove elements
-- `confirm_controller` - Confirmation dialogs
-- `disable_controller` - Disable buttons
-
-**Integration controllers:**
-- `sortable_controller` - Drag and drop
-- `trix_controller` - Rich text editor
-- `flatpickr_controller` - Date picker
-
-**Tracking controllers:**
-- `beacon_controller` - Track events
-- `visibility_controller` - Track visibility
-- `scroll_controller` - Track scrolling
-
-## Performance tips
-
-### 1. Use event delegation
-```javascript
-connect() {
-  // Good: One listener on parent
-  this.element.addEventListener("click", this.#handleClick)
-}
-
-#handleClick(event) {
-  if (event.target.matches(".delete-button")) {
-    this.delete(event)
+export default class extends Controller {
+  connect() {
+    // ✅ Store references
+    this.boundHandler = this.handle.bind(this)
+    document.addEventListener("click", this.boundHandler)
   }
-}
-```
 
-### 2. Debounce expensive operations
-```javascript
-import { debounce } from "./helpers"
-
-connect() {
-  this.search = debounce(this.search.bind(this), 300)
-}
-
-search(event) {
-  // Expensive operation
-}
-```
-
-### 3. Clean up in disconnect
-```javascript
-disconnect() {
-  clearTimeout(this.timeout)
-  this.observer?.disconnect()
-  document.removeEventListener("click", this.boundClose)
-}
-```
-
-### 4. Use IntersectionObserver for visibility
-```javascript
-connect() {
-  this.observer = new IntersectionObserver(this.#handleIntersection)
-  this.observer.observe(this.element)
+  disconnect() {
+    // ✅ Clean up
+    document.removeEventListener("click", this.boundHandler)
+    this.boundHandler = null
+  }
 }
 ```
 

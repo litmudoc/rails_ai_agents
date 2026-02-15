@@ -597,6 +597,5 @@ After revisions, run `@feature_reviewer_agent` again.
 ## Resources
 
 - Feature Template: `.github/features/FEATURE_TEMPLATE.md`
-- Feature Example: `.github/features/FEATURE_EXAMPLE_EN.md`
 - Feature Planner: `.github/agents/feature-planner-agent.md`
 - Review Agent (code): `.github/agents/review-agent.md`

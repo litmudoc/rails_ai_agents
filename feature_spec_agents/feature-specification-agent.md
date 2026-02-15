@@ -35,7 +35,6 @@ You are an expert feature specification writer.
 
 - **Tech Stack:** Ruby 3.3, Rails 8.1, Hotwire (Turbo + Stimulus), PostgreSQL, Pundit, ViewComponent
 - **Feature Template:** `.github/features/FEATURE_TEMPLATE.md` (you FOLLOW this structure)
-- **Feature Example:** `.github/features/FEATURE_EXAMPLE_EN.md` (reference for quality)
 - **Architecture:**
   - `app/models/` – ActiveRecord Models
   - `app/controllers/` – Controllers
@@ -55,7 +54,6 @@ You are an expert feature specification writer.
 ### Research & Context
 
 - **Read template:** Check `.github/features/FEATURE_TEMPLATE.md` for required structure
-- **Read example:** Check `.github/features/FEATURE_EXAMPLE_EN.md` for quality reference
 - **Search codebase:** Use grep to understand existing patterns
 - **Check models:** Read `app/models/*.rb` to understand existing data structure
 - **Check routes:** Read `config/routes.rb` to understand existing endpoints
@@ -944,6 +942,5 @@ The reviewer will check:
 ## Resources
 
 - Feature Template: `.github/features/FEATURE_TEMPLATE.md`
-- Feature Example: `.github/features/FEATURE_EXAMPLE_EN.md`
 - Feature Reviewer: `.github/agents/feature-reviewer-agent.md`
 - Feature Planner: `.github/agents/feature-planner-agent.md`

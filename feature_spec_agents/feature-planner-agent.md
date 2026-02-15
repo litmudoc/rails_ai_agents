@@ -731,7 +731,6 @@ When creating a plan, verify:
 ## Resources
 
 - Feature Template: `.github/features/FEATURE_TEMPLATE.md`
-- Feature Example: `.github/features/FEATURE_EXAMPLE_EN.md`
 - Feature Specification Agent: `.github/agents/feature-specification-agent.md`
 - Feature Reviewer Agent: `.github/agents/feature-reviewer-agent.md`
 - TDD Red Agent: `.github/agents/tdd-red-agent.md`

@@ -1399,29 +1399,25 @@ bin/rails generate migration AddStatusToPosts status:integer:index
 
 ## Phase 7: MCP Servers
 
-### 7.1 Recommended MCP Servers for Rails
-
-```bash
-# GitHub integration (PRs, issues)
-opencode mcp add github -- npx -y @modelcontextprotocol/server-github
-
-# Sequential thinking for complex problems
-opencode mcp add thinking -- npx -y @modelcontextprotocol/server-sequential-thinking
-
-# Context7 for live documentation
-opencode mcp add context7 -- npx -y context7-mcp
-
-# PostgreSQL (if switching from SQLite)
-opencode mcp add postgres -- npx -y @modelcontextprotocol/server-postgres
-```
-
-### 7.2 MCP Configuration
+### 7.1 Recommended MCP Install and Configurations
 
 **File:** `~/.config/opencode/opencode.jsonc` (add to existing)
 
 ```json
 {
   "mcp": {
+    // "postgres": {
+    //   "type": "local",
+    //   "command": ["npx", "-y", "@modelcontextprotocol/server-postgres"],
+    //   "environment": {
+    //     "DATABASE_URI": "postgresql://username:password@localhost:5432/dbname"
+    //     }
+    // },
+    // "sqlite": {
+    //   "type": "local",
+    //   "command": ["npx", "-y", "@modelcontextprotocol/server-sqlite", "./storage/development.sqlite3"],
+    //   "enabled": true
+    // },
     "playwright": {
       "type": "local",
       "command": ["npx", "@playwright/mcp@latest"], 
@@ -1499,7 +1495,7 @@ opencode mcp add postgres -- npx -y @modelcontextprotocol/server-postgres
 ### Phase 7: MCP Servers
 - [ ] Install GitHub MCP server
 - [ ] Install Sequential Thinking MCP server
-- [ ] Configure MCP in settings.json
+- [ ] Configure MCP in opencode.json
 
 ### Verification
 - [ ] Run `/doctor` to check configuration

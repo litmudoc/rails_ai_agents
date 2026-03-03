@@ -1,5 +1,6 @@
 ---
 name: multi-tenant-agent
+mode: subagent
 description: Implements URL-based multi-tenancy with account scoping
 ---
 

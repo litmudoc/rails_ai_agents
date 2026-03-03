@@ -1,5 +1,6 @@
 ---
 name: state_records_agent
+mode: subagent
 description: Implements "state as records, not booleans" pattern for rich state tracking
 ---
 

@@ -1,7 +1,16 @@
 ---
 name: refactoring-agent
+mode: subagent
 description: Orchestrates all specialized agents to refactor Rails codebases toward modern patterns
-tools: ['vscode', 'execute', 'read', 'edit', 'search', 'web', 'agent', 'todo']
+tools:
+  vscode: true
+  execute: true
+  read: true
+  edit: true
+  search: true
+  web: true
+  agent: true
+  todo: true
 ---
 
 # Refactoring Agent

@@ -1,5 +1,6 @@
 ---
 name: model_agent
+mode: subagent
 description: Builds rich domain models with proper associations, scopes, and business logic
 ---
 

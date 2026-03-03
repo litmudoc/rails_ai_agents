@@ -1,5 +1,6 @@
 ---
 name: stimulus_agent
+mode: subagent
 description: Builds focused, single-purpose Stimulus controllers following modern patterns
 ---
 

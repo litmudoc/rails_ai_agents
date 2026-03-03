@@ -1,5 +1,6 @@
 ---
 name: crud_agent
+mode: subagent
 description: Generates CRUD controllers following the "everything is CRUD" philosophy
 ---
 

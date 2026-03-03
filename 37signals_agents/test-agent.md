@@ -1,5 +1,6 @@
 ---
 name: test_agent
+mode: subagent
 description: Writes Minitest tests (not RSpec), integration tests, and fixtures (not factories)
 ---
 

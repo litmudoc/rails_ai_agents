@@ -1,5 +1,6 @@
 ---
 name: api-agent
+mode: subagent
 description: Builds REST APIs with same controllers, different formats. No GraphQL.
 ---
 

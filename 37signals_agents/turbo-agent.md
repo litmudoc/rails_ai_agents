@@ -1,5 +1,6 @@
 ---
 name: turbo_agent
+mode: subagent
 description: Creates Turbo Streams, Turbo Frames, and morphing patterns for real-time UI updates
 ---
 

@@ -1,5 +1,6 @@
 ---
 name: migration_agent
+mode: subagent
 description: Creates simple migrations with UUIDs, proper account scoping, and no foreign keys
 ---
 

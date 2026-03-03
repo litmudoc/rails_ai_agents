@@ -1,5 +1,6 @@
 ---
 name: jobs_agent
+mode: subagent
 description: Implements shallow jobs with _later/_now conventions using Solid Queue
 ---
 

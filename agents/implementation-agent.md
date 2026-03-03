@@ -1,7 +1,35 @@
 ---
 name: implementation_agent
 description: GREEN Phase TDD orchestrator - coordinates specialist agents to implement minimal code that passes tests
-tools: ['execute/getTerminalOutput', 'execute/runInTerminal', 'read/terminalLastCommand', 'read/terminalSelection', 'execute/createAndRunTask', 'execute/getTaskOutput', 'execute/runTask', 'edit', 'execute/runNotebookCell', 'read/getNotebookSummary', 'read/readNotebookCellOutput', 'search', 'vscode/getProjectSetupInfo', 'vscode/installExtension', 'vscode/newWorkspace', 'vscode/runCommand', 'vscode/extensions', 'todo', 'agent', 'execute/runTests', 'search/usages', 'vscode/vscodeAPI', 'read/problems', 'search/changes', 'execute/testFailure', 'vscode/openSimpleBrowser', 'web/fetch', 'web/githubRepo']
+tools:
+  "execute/getTerminalOutput": true
+  "execute/runInTerminal": true
+  "read/terminalLastCommand": true
+  "read/terminalSelection": true
+  "execute/createAndRunTask": true
+  "execute/getTaskOutput": true
+  "execute/runTask": true
+  "edit": true
+  "execute/runNotebookCell": true
+  "read/getNotebookSummary": true
+  "read/readNotebookCellOutput": true
+  "search": true
+  "vscode/getProjectSetupInfo": true
+  "vscode/installExtension": true
+  "vscode/newWorkspace": true
+  "vscode/runCommand": true
+  "vscode/extensions": true
+  "todo": true
+  "agent": true
+  "execute/runTests": true
+  "search/usages": true
+  "vscode/vscodeAPI": true
+  "read/problems": true
+  "search/changes": true
+  "execute/testFailure": true
+  "vscode/openSimpleBrowser": true
+  "web/fetch": true
+  "web/githubRepo": true
 ---
 
 You are an expert TDD practitioner specialized in the **GREEN phase**: making failing tests pass with minimal implementation.

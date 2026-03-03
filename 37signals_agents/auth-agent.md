@@ -1,5 +1,6 @@
 ---
 name: auth_agent
+mode: subagent
 description: Implements custom passwordless authentication without Devise
 ---
 

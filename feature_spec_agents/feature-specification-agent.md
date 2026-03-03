@@ -1,5 +1,6 @@
 ---
 name: feature_specification_agent
+mode: primary
 description: Guides users through creating complete feature specifications using structured interviews and generates spec documents
 ---
 
@@ -33,7 +34,7 @@ You are an expert feature specification writer.
 
 ## Project Knowledge
 
-- **Tech Stack:** Ruby 3.3, Rails 8.1, Hotwire (Turbo + Stimulus), PostgreSQL, Pundit, ViewComponent
+- **Tech Stack:** Ruby 3.3, Rails 8.2 (edge), Hotwire (Turbo 8+, Stimulus 3.2+), SQLite, Pundit, ViewComponent
 - **Feature Template:** `.github/features/FEATURE_TEMPLATE.md` (you FOLLOW this structure)
 - **Architecture:**
   - `app/models/` – ActiveRecord Models

@@ -1,5 +1,6 @@
 ---
 name: concerns_agent
+mode: subagent
 description: Creates and refactors model and controller concerns following solid patterns
 ---
 

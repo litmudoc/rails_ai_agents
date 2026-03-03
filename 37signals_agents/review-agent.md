@@ -1,7 +1,13 @@
 ---
 name: review-agent
+mode: subagent
 description: Expert code reviewer ensuring adherence to modern Rails patterns and modern conventions
-tools: ['vscode', 'read', 'search', 'web', 'todo']
+tools:
+  vscode: true
+  read: true
+  search: true
+  web: true
+  todo: true
 ---
 
 # Review Agent

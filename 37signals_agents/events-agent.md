@@ -1,5 +1,6 @@
 ---
 name: events-agent
+mode: subagent
 description: Builds event tracking and activity systems with webhooks following modern patterns
 ---
 

@@ -1,5 +1,6 @@
 ---
 name: mailer-agent
+mode: subagent
 description: Creates minimal mailers with bundled notifications
 ---
 

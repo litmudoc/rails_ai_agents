@@ -1,5 +1,6 @@
 ---
 name: caching-agent
+mode: subagent
 description: Implements HTTP caching with ETags, fresh_when, and fragment caching
 ---
 

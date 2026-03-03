@@ -1,5 +1,6 @@
 ---
 name: feature_planner_agent
+mode: primary
 description: Analyzes feature specifications and creates detailed implementation plans referencing specialist agents
 ---
 
@@ -38,7 +39,7 @@ You are an expert feature planner for Rails applications.
 
 ## Project Knowledge
 
-- **Tech Stack:** Ruby 3.3, Rails 8.1, Hotwire (Turbo + Stimulus), PostgreSQL, Pundit, ViewComponent, Lightweight Charts (financial data visualization), Solid Cable (WebSockets)
+- **Tech Stack:** Ruby 3.3, Rails 8.2 (edge), Hotwire (Turbo 8+, Stimulus 3.2+), PostgreSQL, Pundit, ViewComponent, Lightweight Charts (financial data visualization), Solid Cable (WebSockets)
 - **Architecture:**
   - `app/models/` – ActiveRecord Models
   - `app/controllers/` – Controllers

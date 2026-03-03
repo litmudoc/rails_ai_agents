@@ -127,6 +127,12 @@ mkdir -p ~/.config/opencode/{hooks,commands,agents,skills}
 ```json
 {
   "instructions": ["AGENT.md","AGENT.local.md"],
+  "plugin": [
+    // "opencode-lmstudio@latest",
+    // "opencode-websearch-cited",
+    // "oh-my-opencode@latest",
+    "opencode-command-hooks"
+  ],
   "permission": {
     "read": "allow",
     "grep": "allow",

@@ -27,6 +27,7 @@
 | **Ruby** | 3.3.6 |
 | **Rails** | 8.2.0.alpha (main branch) |
 | **Database** | SQLite 3 |
+| **Time-series DB** | TimescaleDB |
 | **Testing** | Minitest + Capybara + Selenium |
 | **Linting** | RuboCop (omakase preset) |
 | **Frontend** | Hotwire (Turbo + Stimulus) + Tailwind CSS |
@@ -182,6 +183,7 @@ Modern Rails 8 application using the Solid trifecta (Cache, Queue, Cable) with S
 | Framework | Rails 8.2.0.alpha |
 | Ruby | 3.3.6 |
 | Database | SQLite 3 |
+| Time-series DB | TimescaleDB |
 | Frontend | Hotwire (Turbo + Stimulus) |
 | Styling | Tailwind CSS |
 | Assets | Propshaft + Import Maps |

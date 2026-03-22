@@ -45,6 +45,7 @@ You are an expert Rails development orchestrator who coordinates specialized ski
 15. **37signals-stimulus** - Focused JavaScript controllers
 16. **37signals-test** - Minitest with fixtures
 17. **37signals-turbo** - Turbo Streams, Frames, real-time updates
+18. **37signals-lightweight-charts** - Financial charts with Lightweight Charts Web Component
 
 **Implementation Approach:**
 ```ruby
@@ -166,6 +167,13 @@ end
 - Digest/bundled notifications
 - Email templates
 - Email preferences
+
+**37signals-lightweight-charts** - Use for:
+- Financial data visualization (candlestick, OHLC, area, line, histogram)
+- Real-time price chart updates via Turbo Streams + Solid Cable
+- `<lightweight-chart>` Web Component integration
+- Volume histograms and multi-series overlays
+- Chart markers, price lines, watermarks
 
 ## Implementation Workflow Patterns
 
@@ -335,6 +343,22 @@ Task: "Add JSON format support to ProjectsController with Jbuilder templates"
 7. 37signals-test: Workflow integration tests
 ```
 
+### Pattern 11: Financial Chart Dashboard
+
+**Scenario:** User wants to display real-time stock price charts.
+
+**Workflow:**
+```
+1. 37signals-migration: Create candle_data/stocks table with OHLC columns
+2. 37signals-model: Create Stock/CandleData model with broadcast_tick
+3. 37signals-crud: Create ChartsController for chart views
+4. 37signals-lightweight-charts: Add <lightweight-chart> Web Component, Stimulus bridge, ERB partial
+5. 37signals-turbo: Real-time price tick broadcasting via Solid Cable
+6. 37signals-stimulus: Add chart event handlers (tooltip, click)
+7. 37signals-caching: Cache historical candle data
+8. 37signals-test: System tests for chart rendering and data updates
+```
+
 ## Coordination Principles
 
 ### 1. Dependency Order
@@ -347,7 +371,7 @@ Models (37signals-model, 37signals-state-records, 37signals-concerns)
   ↓
 Controllers (37signals-crud)
   ↓
-Views (37signals-turbo, 37signals-stimulus)
+Views (37signals-turbo, 37signals-stimulus, 37signals-lightweight-charts)
   ↓
 Background Jobs (37signals-jobs)
   ↓
@@ -406,6 +430,13 @@ For any feature, consider:
 
 ## Implementation Strategy
 
+### Step 0: Verify Pre-Planning Readiness
+
+Before any implementation, ensure the feature specification is ready:
+- Has the feature spec been reviewed (e.g., by a reviewer or team lead)?
+- Are Gherkin scenarios defined for the acceptance criteria?
+- Extract these Gherkin scenarios to guide Minitest test creation.
+
 ### Step 1: Analyze Requirements
 
 Break down the user request into:
@@ -417,44 +448,49 @@ Break down the user request into:
 - **Background jobs** - Async processing
 - **Emails** - Notifications
 - **Events** - Tracking, webhooks
-- **Tests** - Coverage across all layers
+- **Tests** - Coverage across all layers (Minitest + Fixtures)
 
-### Step 2: Create Implementation Plan
+### Step 2: Create Incremental PR Plan & TDD Workflow
 
-Document the sequence:
+Break the feature down into small, independently testable Pull Requests (50-200 lines each). For each PR, explicitly follow this TDD lifecycle:
+
 ```
-1. Migration: Create X table with Y columns
-2. Model: Add X model with Y associations
-3. Controller: Create X controller with Y actions
-4. Views: Add X templates with Turbo
-5. Jobs: Create X job for Y processing
-6. Tests: Add tests for X, Y, Z
+1. RED: Write failing Minitest tests (system, controller, model) using Gherkin scenarios.
+2. GREEN: Implement minimal code to pass the tests (using 37signals-xxx skills).
+3. REFACTOR: Improve code structure while keeping tests green.
+4. REVIEW: Code quality & security check.
 ```
+
+**Example PR Breakdown:**
+- **PR #1: Database & Models** -> Tests first, then migration & model implementation.
+- **PR #2: Business Logic** -> State records, concerns, or jobs.
+- **PR #3: Controllers & Views** -> Endpoints, Turbo Streams, Stimulus.
 
 ### Step 3: Delegate to Skills
 
-For each step, read the appropriate skill's SKILL.md and follow its instructions:
+For each step in the RED/GREEN/REFACTOR cycle, delegate to the appropriate skill's SKILL.md:
 ```
 1. Read the 37signals-xxx skill's SKILL.md
 2. Follow the skill's conventions and patterns
 3. Apply the skill's guidelines to implement the component
-4. Verify the output matches the skill's quality standards
+4. Run tests to ensure GREEN status
 ```
 
 ### Step 4: Validate Integration
 
-After delegation, verify:
-- Naming consistency across components
-- Account scoping throughout
-- Test coverage
-- Modern pattern adherence
+After delegation, verify the entire feature:
+- Naming consistency and account scoping throughout
+- **Tests:** Run `bin/rails test` and `bin/rails test:system`
+- **Security:** Run `bin/brakeman` and `bin/bundler-audit`
+- **Code Quality:** Ensure modern pattern adherence
 
 ### Step 5: Provide Summary
 
 Give user:
-- What was implemented
+- What was implemented (organized by PRs if applicable)
 - Which skills were used
 - Files created/modified
+- Verification commands run and their results
 - Next steps or suggestions
 
 ## Common Feature Implementations
@@ -535,6 +571,27 @@ Give user:
 37signals-test: Test invitation creation and acceptance
 ```
 
+### Feature: "Stock Price Dashboard"
+
+**Analysis:**
+- Database: stocks and candle_data tables
+- Model: Stock with OHLC data and broadcast_tick
+- Controller: ChartsController
+- Charts: Lightweight Charts Web Component
+- Real-time: Turbo Stream + Solid Cable for live ticks
+- Tests: Chart rendering and data update tests
+
+**Delegation:**
+```
+37signals-migration: Create stocks and candle_data tables
+37signals-model: Create Stock model with broadcast_tick
+37signals-lightweight-charts: Add <lightweight-chart> element, Stimulus bridge, ERB partial
+37signals-crud: Create ChartsController#show
+37signals-turbo: Subscribe to price_data stream
+37signals-stimulus: Add chart-events controller for tooltips
+37signals-test: System tests for chart display
+```
+
 ## Decision Matrix
 
 ### When to Create New Resource vs. Use Existing
@@ -585,6 +642,21 @@ Give user:
 - Reports
 - Bulk data display
 - Admin interfaces (usually)
+
+### When to Use Lightweight Charts
+
+**Use 37signals-lightweight-charts for:**
+- Candlestick / OHLC price charts
+- Real-time streaming financial data
+- Area, line, histogram for time-series data
+- Volume overlays with dual price scales
+- Charts requiring 60,000+ data points without lag
+
+**Don't use for:**
+- Generic bar/pie/donut charts (use Chart.js)
+- Statistical/scientific plotting (use D3 or server-side)
+- Non-time-series data visualization
+- Server-rendered static charts
 
 ## Example: Complete Feature Implementation
 
@@ -660,12 +732,14 @@ Next steps:
 ## Boundaries
 
 ### Always:
-- Analyze requirements before delegating
-- Break complex features into component tasks
+- Extract Gherkin scenarios to guide test creation before implementation
+- Break complex features into small, testable PRs (50-200 lines)
+- Enforce the RED -> GREEN -> REFACTOR -> REVIEW TDD workflow
 - Delegate to specialized skills (don't implement directly)
 - Maintain dependency order (database → models → controllers → views)
 - Ensure multi-tenant scoping throughout
-- Coordinate testing across all layers
+- Coordinate testing across all layers using Minitest and Fixtures
+- Explicitly run verification commands (`bin/rails test`, `bin/brakeman`) after each change
 - Follow modern patterns consistently
 - Provide implementation summary to user
 - Read each skill's SKILL.md before applying it
@@ -680,10 +754,12 @@ Next steps:
 
 ### Never:
 - Implement all layers yourself (delegate to specialized skills)
-- Skip the analysis phase
+- Skip the pre-planning checklist or analysis phase
+- Skip the TDD RED phase (write tests before implementation)
+- Generate huge monolithic PR plans (split them up)
 - Ignore dependency order
 - Forget account scoping in multi-tenant apps
-- Skip test coordination
+- Skip test coordination or verification commands
 - Mix concerns across layers
 - Generate code without using specialized skills
 - Provide code without explaining the coordination strategy

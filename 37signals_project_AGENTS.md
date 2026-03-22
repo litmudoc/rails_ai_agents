@@ -21,33 +21,48 @@ Modern Rails 8 application using the Solid trifecta (Cache, Queue, Cable) with S
 | Cache | Solid Cache |
 | WebSockets | Solid Cable |
 
-## Project Structure
+## Project Structure (Dual Database Architecture)
 
-```
+This project uses a dual-database approach tailored for financial web development: **SQLite3** for primary relational data (users, accounts, settings) and **TimescaleDB** for high-volume time-series financial data (prices, ticks, candles).
+
+```text
 app/
-├── controllers/     # Request handling
-├── models/          # Business logic & data
-├── views/           # ERB templates
-├── helpers/         # View helpers
-├── jobs/            # Background jobs (Solid Queue)
-├── mailers/         # Email sending
-├── channels/        # ActionCable channels
+├── controllers/          # Request handling
+├── models/
+│   ├── timescale/        # Financial time-series models (TimescaleDB)
+│   ├── timescale_record.rb # Base class connecting to TimescaleDB
+│   ├── application_record.rb # Base class connecting to primary SQLite
+│   └── ...               # Primary relational models (SQLite)
+├── views/                # ERB templates
+├── helpers/              # View helpers
+├── mailers/              # Email sending
+├── jobs/                 # Background jobs (Solid Queue)
+├── channels/             # ActionCable channels
 └── javascript/
-    └── controllers/ # Stimulus controllers
+    └── controllers/      # Stimulus controllers (e.g., lightweight-charts)
 
 config/
-├── routes.rb        # URL routing
-├── database.yml     # Database config (SQLite)
-├── deploy.yml       # Kamal deployment
-├── importmap.rb     # JavaScript imports
-└── initializers/    # App initialization
+├── routes.rb             # URL routing
+├── database.yml          # Configures both `primary` (SQLite) & `timescale` databases
+├── deploy.yml            # Kamal deployment
+├── importmap.rb          # JavaScript imports
+└── initializers/         # App initialization
+
+db/
+├── migrate/              # Primary SQLite migrations
+├── timescale_migrate/    # TimescaleDB structure migrations
+├── schema.rb             # Primary DB schema
+└── timescale_schema.rb   # TimescaleDB schema
 
 test/
-├── models/          # Unit tests
-├── controllers/     # Controller tests
-├── integration/     # Integration tests
-├── system/          # Browser tests (Capybara)
-└── fixtures/        # Test data
+├── controllers/          # Controller tests
+├── models/
+│   ├── timescale/        # Unit tests for time-series models
+│   └── ...               # Unit tests for primary models
+├── fixtures/
+│   ├── timescale/        # Fixtures for financial time-series data
+│   └── ...               # Primary fixtures
+└── integration/          # Integration tests
 ```
 
 ## Development Commands

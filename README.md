@@ -1,172 +1,87 @@
-# Rails AI Skills
+# 37signals AI Skills for Rails
 
-A library of 48 AI skills for Ruby on Rails development. Drop them into your project and your AI coding assistant instantly knows Rails conventions, TDD workflows, and production patterns.
+A specialized ecosystem of AI skills for Ruby on Rails development, focused on the Basecamp/HEY (37signals) philosophy. Drop them into your project and your AI coding assistant instantly knows Minitest, Hotwire, Fat Models, and production patterns used by 37signals.
 
-Works with Mistral Vibe, Claude Code, GitHub Copilot, Cursor, Gemini CLI, and [30+ other tools](https://agentskills.io/specification) that support the Agent Skills standard.
-
-Also includes a separate [37signals-style collection](#37signals-collection) (18 skills) for teams following the Basecamp approach.
-
-> For original agents and skills, see [this commit](https://github.com/ThibautBaissac/rails_ai_agents/tree/15fdeaf68af5d7ef274277217af27fe5a5f07e45).
-
-## Quick Start
-
-```bash
-# Copy the skills into your Rails project
-cp -r .agents/ /path/to/your-rails-app/.agents/
-
-# For Claude Code, also copy the symlinked discovery directory
-cp -rP .claude/skills/ /path/to/your-rails-app/.claude/skills/
-```
-
-Skills auto-activate based on what you ask. Say "create a service object for order processing" and the `rails-service-object` skill kicks in. Say "write tests for this model" and `rspec-agent` takes over.
-
-You can also invoke them directly:
-
-```
-/feature-spec user registration
-/code-review
-/security-audit
-/tdd-red-agent
-```
+Works with Opencode, Mistral Vibe, Claude Code, GitHub Copilot, Cursor, Gemini CLI, and [30+ other tools](https://agentskills.io/specification) that support the Agent Skills standard.
 
 ## What's Inside
 
-### Feature Specification Workflow
+The `37signals_skills/` directory contains skills following the Basecamp/HEY philosophy. Key differences from standard Rails conventions include:
 
-Three skills that take you from idea to implementation plan:
-
-| Skill | Purpose |
+| Area | 37signals Pattern |
 |---|---|
-| `feature-spec` | Structured interview to write a complete spec with Gherkin scenarios |
-| `feature-review` | Scores the spec 0-10, identifies gaps, generates missing scenarios |
-| `feature-plan` | Converts spec into a TDD implementation plan with PR breakdown |
+| Business logic | Fat models (avoid service objects) |
+| Tests | Minitest + fixtures |
+| Shared behavior | Concerns everywhere |
+| Request context | `Current` attributes |
+| State | State as records |
+| IDs | UUIDs |
+| Multi-tenancy | URL-based with `Current.account` |
 
-### TDD Workflow
+### Included Skills
 
-| Skill | Phase | What it does |
-|---|---|---|
-| `tdd-cycle` | All | Guides the full Red-Green-Refactor cycle |
-| `tdd-red-agent` | Red | Writes failing tests. Never touches `app/` |
-| `implementation-agent` | Green | Coordinates specialist agents to make tests pass |
-| `tdd-refactoring-agent` | Refactor | Improves code while keeping tests green |
-| `rspec-agent` | Any | Writes comprehensive specs for existing code |
+Here is the complete list of 37signals-style skills available in this collection:
 
-### Rails Layer Specialists
-
-Isolated agents (`context: fork`) with deep domain knowledge:
-
-| Skill | Domain |
+| Skill | Description |
 |---|---|
-| `model-agent` | ActiveRecord models, validations, associations, scopes |
-| `controller-agent` | Thin RESTful controllers, strong params, Pundit |
-| `service-agent` | Service objects, Result pattern, SOLID |
-| `migration-agent` | Safe, reversible database migrations |
-| `policy-agent` | Pundit authorization policies |
-| `form-agent` | Multi-model forms, wizard forms |
-| `query-agent` | Complex queries, N+1 prevention |
-| `presenter-agent` | View logic separation with SimpleDelegator |
-| `viewcomponent-agent` | Reusable, tested UI components |
-| `job-agent` | Background jobs with Solid Queue |
-| `mailer-agent` | ActionMailer with previews and templates |
-| `turbo-agent` | Turbo Frames, Streams, Drive |
-| `stimulus-agent` | Stimulus controllers |
-| `tailwind-agent` | Tailwind CSS styling |
-| `lint-agent` | RuboCop linting and auto-correction |
+| `37signals-api` | Builds REST APIs using respond_to blocks with Jbuilder templates following the 37signals same-controllers-different-formats philosophy. Use when adding API endpoints, JSON responses, token authentication, or when user mentions API, JSON, REST, or Jbuilder. |
+| `37signals-auth` | Implements custom passwordless authentication without Devise. Use when setting up authentication, login flows, session management, password resets, or when user mentions auth, login, passwordless, or sessions. |
+| `37signals-caching` | Implements HTTP caching with ETags, fresh_when, stale?, and fragment caching. Use when optimizing performance, adding caching layers, or when user mentions ETags, HTTP caching, fresh_when, stale?, cache keys, or Russian doll caching. |
+| `37signals-concerns` | Creates and refactors model and controller concerns for shared behavior following 37signals patterns. Use when extracting shared code, organizing models with horizontal concerns, DRYing up controllers, or when user mentions concerns, mixins, modules, or shared behavior. |
+| `37signals-crud` | Generates RESTful controllers following the 37signals everything-is-CRUD philosophy. Maps any action to CRUD by creating new resources instead of custom actions. Use when adding features, creating controllers, or when user mentions REST, routing, controllers, or state-change resources. |
+| `37signals-events` | Builds event tracking and activity systems with webhooks following 37signals patterns. Use when implementing audit trails, activity feeds, event sourcing, or when user mentions events, tracking, webhooks, or activity logs. |
+| `37signals-implement` | Orchestrates implementation of complete Rails features across models, controllers, views, and tests following 37signals conventions. Use when implementing a full feature end-to-end or when user mentions feature implementation, full-stack, or orchestration. |
+| `37signals-jobs` | Implements shallow background jobs with _later/_now conventions using Solid Queue. Use when adding background processing, async operations, scheduled tasks, or when user mentions jobs, queues, Solid Queue, or background workers. |
+| `37signals-lightweight-charts` | Builds high-performance financial charts using TradingView Lightweight Charts wrapped in a <lightweight-chart> Web Component custom element, integrated with Stimulus bridge controllers and Turbo Streams for real-time updates. Use when adding candlestick charts, price charts, financial data visualization, or when user mentions Lightweight Charts, trading charts, OHLC, or real-time prices. |
+| `37signals-mailer` | Creates minimal Action Mailer classes with bundled notification patterns following 37signals conventions. Use when sending emails, creating notification systems, or when user mentions mailers, emails, notifications, or transactional messages. |
+| `37signals-migration` | Creates database migrations with UUIDs, account scoping, and no foreign key constraints following 37signals patterns. Use when creating tables, adding columns, modifying schema, or when user mentions migrations, database structure, or schema changes. |
+| `37signals-model` | Builds rich domain models with business logic, concerns, and proper associations following the 37signals fat-models-over-service-objects philosophy. Use when creating models, adding validations, scopes, callbacks, or business logic methods. |
+| `37signals-multi-tenant` | Implements URL-based multi-tenancy with account scoping following 37signals patterns. Use when setting up multi-tenant architecture, account isolation, tenant scoping, or when user mentions multi-tenancy, accounts, or tenant separation. |
+| `37signals-refactoring` | Orchestrates refactoring of Rails codebases toward 37signals patterns and modern conventions. Use when refactoring existing code, improving architecture, migrating to modern Rails patterns, or when user mentions refactoring, code improvement, or technical debt. |
+| `37signals-review` | Reviews code for adherence to 37signals Rails patterns and conventions. Checks for rich models, CRUD controllers, proper concerns, and Hotwire usage. Use when requesting code review, architecture audit, or quality analysis. |
+| `37signals-state-records` | Implements the state-as-records-not-booleans pattern for rich state tracking following 37signals conventions. Use when modeling state changes, replacing boolean flags with record-based state, or when user mentions state records, closures, publications, or state tracking. |
+| `37signals-stimulus` | Builds focused, single-purpose Stimulus controllers for progressive enhancement following 37signals patterns. Use when adding JavaScript behavior, UI interactions, form enhancements, or when user mentions Stimulus, JavaScript controllers, or sprinkles. |
+| `37signals-test` | Writes Minitest tests with integration tests and fixtures following 37signals conventions. Uses Minitest (not RSpec) and fixtures (not factories). Use when writing tests, adding test coverage, or when user mentions testing, Minitest, fixtures, or integration tests. |
+| `37signals-turbo` | Creates Turbo Streams, Turbo Frames, and morphing patterns for real-time UI updates following 37signals conventions. Use when adding real-time updates, page navigation, form submissions, or when user mentions Turbo, Streams, Frames, Drive, or morphing. |
 
-### Pattern & Knowledge Skills
+## Opencode Configuration
 
-Injected inline (no subprocess) — they teach conventions:
+To properly configure these skills to work with **Opencode**, you need to set up the appropriate `AGENT.md` files:
 
-| Skill | Teaches |
-|---|---|
-| `rails-architecture` | Layered architecture, where to put code |
-| `rails-service-object` | Service object pattern with Result class |
-| `rails-model-generator` | Model generation with TDD |
-| `rails-controller` | Controller conventions with request specs |
-| `rails-concern` | Shared behavior with concerns |
-| `rails-presenter` | Presenter/decorator pattern |
-| `rails-query-object` | Query object pattern |
-| `authentication-flow` | Rails 8 built-in authentication |
-| `authorization-pundit` | Policy-based authorization |
-| `hotwire-patterns` | Turbo + Stimulus patterns |
-| `viewcomponent-patterns` | ViewComponent patterns |
-| `form-object-patterns` | Form object patterns |
-| `database-migrations` | Migration best practices |
-| `caching-strategies` | Fragment, Russian doll, low-level caching |
-| `performance-optimization` | N+1 detection, query optimization |
-| `action-cable-patterns` | WebSocket real-time features |
-| `action-mailer-patterns` | Transactional emails |
-| `active-storage-setup` | File uploads and variants |
-| `api-versioning` | RESTful API design |
-| `i18n-patterns` | Internationalization |
-| `solid-queue-setup` | Background job configuration |
+1. **Global Configuration**
+   Copy `37signals_global_AGENTS.md` to your Opencode global agent settings:
+   ```bash
+   mkdir -p ~/.config/opencode
+   cp 37signals_global_AGENTS.md ~/.config/opencode/AGENT.md
+   ```
 
-### Utilities
+2. **Project Configuration**
+   Copy `37signals_project_AGENTS.md` and `37signals_project_AGENTS.local.md` to your project's root directory:
+   ```bash
+   cp 37signals_project_AGENTS.md /path/to/your-rails-app/AGENT.md
+   cp 37signals_project_AGENTS.local.md /path/to/your-rails-app/AGENT.local.md
+   ```
 
-| Skill | Purpose |
-|---|---|
-| `code-review` | SOLID analysis, N+1 detection, anti-patterns (read-only) |
-| `security-audit` | OWASP Top 10 audit with Brakeman |
-| `frame-problem` | Reframes vague requests into clear problems |
-| `refine-specification` | Clarifying questions for draft specs |
+### Understanding the Agent Files
+
+- **`~/.config/opencode/AGENT.md`**: Enforces absolute global rules across all your projects (secrets protection, dangerous operations) and establishes your developer identity.
+- **`AGENT.md` (Project Level)**: Contains the project-specific tech stack (Rails 8, SQLite, Solid trifecta, Hotwire), structure conventions, and strictly directs the AI to use the `skills/` directory.
+- **`AGENT.local.md` (Project Local)**: Contains your personal development overrides (e.g., verbose test output, displaying SQL queries) that should not be committed to version control.
 
 ## Typical Workflow
 
-```
-/feature-spec checkout flow        # 1. Write the spec
-/feature-review features/checkout  # 2. Review and score it
-/feature-plan features/checkout    # 3. Break into PRs
+When asking Opencode to implement a feature, it will automatically:
+1. Reference the master orchestration skill (`skills/37signals-implement/SKILL.md`).
+2. Follow a strict **RED -> GREEN -> REFACTOR -> REVIEW** TDD workflow using Minitest.
+3. Break down massive tasks into small (50-200 line) Pull Requests.
+4. Delegate tasks to specialized skills like `37signals-crud`, `37signals-model`, and `37signals-turbo`.
 
-/tdd-red-agent                     # 4. Write failing tests (RED)
-/implementation-agent              # 5. Make them pass (GREEN)
-/tdd-refactoring-agent             # 6. Clean up (REFACTOR)
+## Installation for Other Tools
 
-/code-review                       # 7. Quality check
-/security-audit                    # 8. Security check
-```
+Copy the `37signals_skills/` directory to `.agents/skills/` in your Rails application:
 
-## 37signals Collection
-
-The `37signals_skills/` directory contains 18 skills following the Basecamp/HEY philosophy. Key differences from the main collection:
-
-| | Main collection | 37signals |
-|---|---|---|
-| Business logic | Service objects | Fat models |
-| Tests | RSpec + FactoryBot | Minitest + fixtures |
-| Shared behavior | Separate layers | Concerns everywhere |
-| Request context | Explicit params | `Current` attributes |
-| State | Enums / booleans | State as records |
-| IDs | Integer (default) | UUIDs |
-| Multi-tenancy | Various | URL-based with `Current.account` |
-
-To use them, copy `37signals_skills/` into your project's `.agents/skills/` directory.
-
-## How Skills Work
-
-Each skill is a folder with a `SKILL.md` file:
-
-```
-skill-name/
-├── SKILL.md           # Frontmatter metadata + instructions
-└── reference/         # Optional supplementary docs
-    └── *.md
-```
-
-Two execution modes:
-
-- **Inline skills** — instructions are injected into the conversation. Low token cost. Good for conventions and patterns.
-- **Forked skills** (`context: fork`) — run in an isolated subprocess. Don't pollute your main context. Good for long-running tasks like reviews, audits, and code generation.
-
-Skills with `user-invocable: true` in their frontmatter appear as `/slash-commands`.
-
-## Project Structure
-
-```
-.agents/skills/          # 48 skills (canonical location)
-.claude/skills/          # Symlinks to .agents/skills/ (Claude Code discovery)
-37signals_skills/        # 18 skills, 37signals/Basecamp style
-skill_vs_agent.md        # Decision guide: skill vs agent
-universal_skills.md      # Agent Skills standard reference
+```bash
+cp -r 37signals_skills/ /path/to/your-rails-app/.agents/skills/
 ```
 
 ## License

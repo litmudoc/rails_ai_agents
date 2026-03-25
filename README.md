@@ -1,3 +1,5 @@
+**New:** [AI Terminology Glossary](glossary.md) — 289 terms across 25 categories. Also available as a [browsable HTML version](https://thibautbaissac.github.io/ai/glossary.html).
+
 # Rails AI Skills
 
 A library of 48 AI skills for Ruby on Rails development. Drop them into your project and your AI coding assistant instantly knows Rails conventions, TDD workflows, and production patterns.
@@ -5,6 +7,7 @@ A library of 48 AI skills for Ruby on Rails development. Drop them into your pro
 Works with Mistral Vibe, Claude Code, GitHub Copilot, Cursor, Gemini CLI, and [30+ other tools](https://agentskills.io/specification) that support the Agent Skills standard.
 
 Also includes a separate [37signals-style collection](#37signals-collection) (18 skills) for teams following the Basecamp approach.
+
 
 > For original agents and skills, see [this commit](https://github.com/ThibautBaissac/rails_ai_agents/tree/15fdeaf68af5d7ef274277217af27fe5a5f07e45).
 

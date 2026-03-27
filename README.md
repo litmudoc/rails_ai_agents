@@ -1,6 +1,6 @@
 # Rails AI Agents
 
-A production-ready Claude Code setup for Ruby on Rails development: **18 specialized agents**, **17 skills**, **10 path-scoped rules**, and **5 lifecycle hooks**. Drop it into your project and your AI assistant instantly knows Rails conventions, TDD workflows, and production patterns.
+A production-ready Claude Code setup for Ruby on Rails development: **18 specialized agents**, **20 skills**, **12 path-scoped rules**, and **6 lifecycle hooks**. Drop it into your project and your AI assistant instantly knows Rails conventions, TDD workflows, and production patterns.
 
 Also includes:
 - separate [37signals-style collection](#37signals-collection).
@@ -55,10 +55,11 @@ You can also invoke skills directly:
 
 ### Skills (`.claude/skills/`)
 
-17 skills with reference docs. Two patterns: **task skills** (user-invocable workflows) and **knowledge skills** (auto-loaded conventions).
+20 skills with reference docs. Two patterns: **task skills** (user-invocable workflows) and **knowledge skills** (auto-loaded conventions).
 
 | Skill | Type | Purpose |
 |---|---|---|
+| `feature` | Task | Orchestrates full feature lifecycle: spec → review → plan → TDD |
 | `feature-spec` | Task | Structured interview to write a complete spec with Gherkin scenarios |
 | `feature-review` | Task | Scores specs 0-10, identifies gaps, generates missing scenarios |
 | `feature-plan` | Task | Converts spec into TDD implementation plan with PR breakdown |
@@ -66,10 +67,12 @@ You can also invoke skills directly:
 | `security-audit` | Task | OWASP Top 10 audit with Brakeman (runs with opus) |
 | `tdd-cycle` | Task | Guides full Red-Green-Refactor cycle |
 | `frame-problem` | Task | Reframes vague requests into clear problems |
+| `prompt-improver` | Task | Scores and rewrites vague prompts into specific, actionable ones |
 | `rails-architecture` | Knowledge | Layered architecture decisions (runs with opus) |
 | `authentication-flow` | Knowledge | Rails 8 built-in authentication |
 | `caching-strategies` | Knowledge | Fragment, Russian doll, low-level caching |
 | `performance-optimization` | Knowledge | N+1 detection, query optimization |
+| `extraction-timing` | Knowledge | When and how to extract services, queries, concerns |
 | `action-cable-patterns` | Knowledge | WebSocket real-time features |
 | `active-storage-setup` | Knowledge | File uploads and variants |
 | `api-versioning` | Knowledge | RESTful API design |
@@ -79,7 +82,7 @@ You can also invoke skills directly:
 
 ### Rules (`.claude/rules/`)
 
-10 path-scoped rules that auto-load only when Claude works on matching files:
+12 path-scoped rules that auto-load only when Claude works on matching files:
 
 | Rule | Scoped to |
 |---|---|
@@ -93,6 +96,8 @@ You can also invoke skills directly:
 | `migrations.md` | `db/migrate/**`, `db/schema.rb` |
 | `views.md` | `app/views/**`, `app/components/**`, `app/presenters/**` |
 | `testing.md` | `spec/**` |
+| `principles.md` | `app/**/*.rb` |
+| `anti-patterns.md` | `app/**/*.rb`, `spec/**/*.rb` |
 
 ### Hooks (`.claude/settings.json`)
 
@@ -140,19 +145,20 @@ You can also invoke skills directly:
       model/
       service/
       ...
-  skills/                    # 17 skills
+  skills/                    # 20 skills
     feature-spec/SKILL.md
     rails-architecture/SKILL.md
     ...
-  rules/                     # 10 path-scoped rules
+  rules/                     # 12 path-scoped rules
     models.md
     controllers.md
     ...
 37signals_skills/            # 18 skills, 37signals/Basecamp style
 docs/
-    claude-code-extensibility-guide.md  # Comprehensive extensibility reference
-    mcp-servers-rails-guide.md          # MCP servers for Rails development
-    rails-development-principles.md     # Development principles guide
+    claude-code-extensibility-guide.md      # Comprehensive extensibility reference
+    mcp-servers-rails-guide.md              # MCP servers for Rails development
+    rails-development-principles.md         # Development principles guide
+    prompt-engineering-for-claude-code.md   # Prompt engineering guide
 glossary.md                  # AI terminology glossary
 ```
 

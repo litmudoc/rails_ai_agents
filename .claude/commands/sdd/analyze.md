@@ -64,6 +64,10 @@ Load only the minimal necessary context from each artifact:
 
 - Load `.specify/memory/constitution.md` for principle validation
 
+**From lessons learned (if available):**
+
+- **IF EXISTS**: Load `.specify/memory/lessons-learned.md` for known issue cross-referencing
+
 ### 3. Build Semantic Models
 
 Create internal representations (do not include raw artifacts in output):
@@ -116,6 +120,12 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 - Data entities referenced in plan but absent in spec (or vice versa)
 - Task ordering contradictions (e.g., integration tasks before foundational setup tasks without dependency note)
 - Conflicting requirements (e.g., one requires Next.js while other specifies Vue)
+
+#### G. Known Issue Recurrence
+
+- If `.specify/memory/lessons-learned.md` was loaded, check whether any past lessons tagged `[category:error-recovery]` or `[category:architecture]` describe problems that could recur in the current feature
+- Flag matches as MEDIUM severity with a recommendation to address proactively
+- Skip this pass entirely if lessons-learned.md does not exist or is empty
 
 ### 5. Severity Assignment
 

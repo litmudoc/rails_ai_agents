@@ -162,7 +162,7 @@ The `.specify/` directory contains the scaffolding that powers SDD commands:
 
 - **`templates/`** — Markdown templates for specs, plans, tasks, checklists, constitutions, and agent context files
 - **`scripts/bash/`** — Shell scripts for branch creation, prerequisite checking, plan setup, and agent context updates
-- **`memory/`** — Persistent project state (constitution, decisions)
+- **`memory/`** — Persistent project state (constitution, lessons learned across features)
 - **`init-options.json`** — Configuration (branch numbering mode, AI agent type)
 
 SDD supports extensibility via `.specify/extensions.yml` for before/after hooks on any command, template overrides in `.specify/templates/overrides/`, and presets in `.specify/presets/`.
@@ -170,6 +170,7 @@ SDD supports extensibility via `.specify/extensions.yml` for before/after hooks 
 ### Key SDD Concepts
 
 - **Constitution** — Non-negotiable project principles validated at every planning gate
+- **Lessons Learned** — Cross-feature learnings accumulate in `.specify/memory/lessons-learned.md` and feed into future planning and implementation
 - **Specs are stakeholder-facing** — No implementation details; focus on WHAT and WHY
 - **Checklists are "unit tests for English"** — They validate requirements quality, not implementation correctness
 - **Tasks organized by user story** — Each story is independently implementable and testable (MVP-first)

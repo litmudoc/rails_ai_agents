@@ -86,6 +86,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **IF EXISTS**: Read contracts/ for API specifications and test requirements
    - **IF EXISTS**: Read research.md for technical decisions and constraints
    - **IF EXISTS**: Read quickstart.md for integration scenarios
+   - **IF EXISTS**: Read `.specify/memory/lessons-learned.md` for cross-feature learnings — filter to entries tagged `[phase:implement]` or `[phase:all]` and note any relevant to the current feature's tech stack or error-prone areas
 
 4. **Project Setup Verification**:
    - **REQUIRED**: Verify `.gitignore` contains essential Ruby/Rails patterns:
@@ -135,6 +136,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Provide clear error messages with context for debugging
    - Suggest next steps if implementation cannot proceed
    - **IMPORTANT** For completed tasks, make sure to mark the task off as [X] in the tasks file.
+   - **LESSONS CAPTURE (errors)**: When a significant implementation problem occurs (dependency conflict, unexpected framework behavior, workaround for a limitation, recurring test failure pattern), append a concise entry to `.specify/memory/lessons-learned.md` under the appropriate section using the entry format documented in that file. Only log problems useful for future features — skip routine debugging and typos. Create the file with its standard header if it does not exist.
 
 9. Completion validation:
    - Verify all required tasks are completed
@@ -142,6 +144,23 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Validate that tests pass and coverage meets requirements
    - Confirm the implementation follows the technical plan
    - Report final status with summary of completed work
+
+   **Lessons learned capture (completion)**:
+   - Review the implementation session for noteworthy patterns, surprises, or insights
+   - Present the user with a brief prompt:
+     ```
+     ## Lessons Learned
+
+     Implementation complete. Any learnings worth recording for future features?
+
+     Suggested based on this session:
+     - [1-3 specific observations from the implementation]
+
+     Reply: (1) Accept suggestions, (2) Add your own, (3) Skip
+     ```
+   - If the user provides input, append entries to `.specify/memory/lessons-learned.md`
+   - If the user skips, proceed without writing
+   - Create the file with its standard header if it does not exist
 
 Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/sdd:tasks` first to regenerate the task list.
 

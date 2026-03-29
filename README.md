@@ -1,6 +1,6 @@
 # Rails AI Agents
 
-A production-ready Claude Code setup for Ruby on Rails development: **18 specialized agents**, **14 slash commands** (including the [SDD kit](#spec-driven-development-sdd-kit)), **13 skills**, **12 path-scoped rules**, and **6 lifecycle hooks**. Drop it into your project and your AI assistant instantly knows Rails conventions, TDD workflows, and production patterns.
+A production-ready Claude Code setup for Ruby on Rails development: **18 specialized agents**, **16 slash commands** (including the [SDD kit](#spec-driven-development-sdd-kit)), **13 skills**, **12 path-scoped rules**, and **6 lifecycle hooks**. Drop it into your project and your AI assistant instantly knows Rails conventions, TDD workflows, and production patterns.
 
 Also includes:
 - [Spec Driven Development (SDD) kit](#spec-driven-development-sdd-kit) — a full specification-to-implementation pipeline.
@@ -113,8 +113,7 @@ cp -r .claude/ /path/to/your-rails-app/.claude/
 
 ## Spec Driven Development (SDD) Kit
 
-A structured specification-to-implementation pipeline powered by 8 slash commands. SDD enforces a disciplined workflow: define what you're building before writing code, validate requirements quality, then implement from a task plan.
-Based on Github Spec-kit
+A structured specification-to-implementation pipeline powered by 10 slash commands. SDD enforces a disciplined workflow: define what you're building before writing code, validate requirements quality, then implement from a task plan.
 
 ### SDD Commands (`.claude/commands/sdd/`)
 
@@ -123,11 +122,13 @@ Based on Github Spec-kit
 | `/sdd:constitution` | Create or update the project constitution — core principles and governance rules |
 | `/sdd:specify` | Generate a feature specification from a natural language description |
 | `/sdd:clarify` | Ask up to 5 targeted questions to reduce ambiguity in the spec |
+| `/sdd:spec-review` | Adversarial review of the spec from security, performance, edge-case, scalability, and compliance perspectives |
 | `/sdd:checklist` | Generate a requirements quality checklist |
 | `/sdd:plan` | Create a technical implementation plan with research, data model, and contracts |
 | `/sdd:tasks` | Break the plan into dependency-ordered, executable tasks organized by user story |
 | `/sdd:analyze` | Read-only consistency analysis across spec, plan, and tasks |
 | `/sdd:implement` | Execute the task plan phase-by-phase with progress tracking |
+| `/sdd:implement-subagents` | Same as implement, but spawns a fresh-context subagent per task to prevent context rot on large features |
 
 ### SDD Workflow
 
@@ -135,11 +136,14 @@ Based on Github Spec-kit
 /sdd:constitution                  # 1. Define project principles (once)
 /sdd:specify user authentication   # 2. Write the feature spec
 /sdd:clarify                       # 3. Resolve ambiguities (optional)
-/sdd:checklist security            # 4. Validate requirements quality (optional)
-/sdd:plan                          # 5. Generate technical plan + data model
-/sdd:tasks                         # 6. Break into ordered tasks
-/sdd:analyze                       # 7. Cross-artifact consistency check
-/sdd:implement                     # 8. Execute tasks with verification
+/sdd:spec-review                   # 4. Adversarial review from 5 perspectives (optional)
+/sdd:checklist security            # 5. Validate requirements quality (optional)
+/sdd:plan                          # 6. Generate technical plan + data model
+/sdd:tasks                         # 7. Break into ordered tasks
+/sdd:analyze                       # 8. Cross-artifact consistency check
+/sdd:implement                     # 9. Execute tasks with verification
+# Or for large features:
+/sdd:implement-subagents           # 9. Fresh-context subagent per task (prevents context rot)
 ```
 
 Each command hands off to the next via suggested prompts. The pipeline creates a `specs/<branch-name>/` directory with all artifacts:
@@ -171,9 +175,11 @@ SDD supports extensibility via `.specify/extensions.yml` for before/after hooks 
 
 - **Constitution** — Non-negotiable project principles validated at every planning gate
 - **Lessons Learned** — Cross-feature learnings accumulate in `.specify/memory/lessons-learned.md` and feed into future planning and implementation
+- **Adversarial Spec Review** — `/sdd:spec-review` challenges the spec from security, performance, edge-case, scalability, and compliance perspectives before planning begins
 - **Specs are stakeholder-facing** — No implementation details; focus on WHAT and WHY
 - **Checklists are "unit tests for English"** — They validate requirements quality, not implementation correctness
 - **Tasks organized by user story** — Each story is independently implementable and testable (MVP-first)
+- **Fresh-context implementation** — `/sdd:implement-subagents` spawns a clean subagent per task, preventing context rot on large features
 
 ## Extensibility Guide
 

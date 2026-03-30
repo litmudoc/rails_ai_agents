@@ -3,10 +3,10 @@
 A production-ready Claude Code setup for Ruby on Rails development: **18 specialized agents**, **20 slash commands** (including the [SDD kit](#spec-driven-development-sdd-kit)), **13 skills**, **12 path-scoped rules**, and **6 lifecycle hooks**. Drop it into your project and your AI assistant instantly knows Rails conventions, TDD workflows, and production patterns.
 
 Also includes:
-- [Spec Driven Development (SDD) kit](#spec-driven-development-sdd-kit) — a full specification-to-implementation pipeline + [lightweight mode](#sdd-change-lightweight-mode) for bug fixes.
-- separate [37signals-style collection](#37signals-collection).
+- [Spec Driven Development (SDD) kit](#spec-driven-development-sdd-kit) — a full specification-to-implementation pipeline + lightweight mode for bug fixes.
+- separate 37signals-style agents, skills and rules collection.
 - Claude Code Extensibility Guide
-- AI Terminology Glossary — 289 terms across 25 categories. Also available as a [browsable HTML version](https://thibautbaissac.github.io/ai/glossary.html).
+- and more!
 
 
 ## Quick Start
@@ -216,9 +216,22 @@ For bug fixes and small features that don't need the full SDD ceremony. Three co
 
 The lightweight pipeline warns you if your change looks too complex (>3 acceptance criteria or >6 files affected) and suggests switching to the full pipeline.
 
-## Extensibility Guide
+## Documentation
 
-The [Claude Code Extensibility Guide](docs/claude-code-extensibility-guide.md) covers all extension mechanisms: CLAUDE.md, skills, hooks, subagents, Agent Teams, MCP servers, and plugins. Includes decision trees, configuration references, community patterns, and an adoption playbook.
+| Document | Purpose |
+|---|---|
+| [Your First SDD Feature](docs/your-first-sdd-feature.md) | Step-by-step onboarding walkthrough for new developers using the SDD kit |
+| [SDD Team Scalability Analysis](docs/sdd-team-scalability-analysis.md) | Risks, gaps, and roadmap for scaling SDD to a 30-developer team |
+| [Rails Development Principles](docs/rails-development-principles.md) | Universal software principles, Rails doctrine, modern Rails 8 architecture, testing, security, and performance |
+| [Prompt Engineering for Claude Code](docs/prompt-engineering-for-claude-code.md) | Writing effective prompts for Claude Code in web development, with Rails-specific patterns |
+| [Claude Code Extensibility Guide](docs/claude-code-extensibility-guide.md) | All extension mechanisms: CLAUDE.md, skills, hooks, subagents, Agent Teams, MCP servers, and plugins |
+| [Claude Code Frontmatter Reference](docs/claude-code-frontmatter-reference.md) | YAML frontmatter syntax for configuring agents, skills, and commands in `.claude/` files |
+| [MCP Servers for Rails](docs/mcp-servers-rails-guide.md) | Extending Claude Code with Model Context Protocol servers for Rails, databases, and APIs |
+| [PRD Best Practices](docs/prd-best-practices.md) | Writing effective Product Requirements Documents in agile, AI-in-the-loop environments |
+| [Technical Design Documents](docs/technical-design-document.md) | TDDs, ADRs, and Engineering RFCs for agentic SDLC teams |
+| [Design Specifications](docs/design-specification.md) | UI/UX design specs and API specifications (OpenAPI) for frontend/backend contracts |
+| [Specification Document Hierarchy](docs/specification-document-hierarchy.md) | Reference map showing which documents answer which core questions |
+| [AI Terminology Glossary](docs/ai-glossary.md) | 289 AI/ML terms across 25 categories — also available as a [browsable HTML version](https://thibautbaissac.github.io/ai/glossary.html) |
 
 ## License
 

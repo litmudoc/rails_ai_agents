@@ -1,5 +1,8 @@
 ---
-globs: "app/mailers/**/*.rb, app/views/**/*_mailer/**/*.erb, spec/mailers/**/*.rb"
+paths:
+  - "app/mailers/**/*.rb"
+  - "app/views/**/*_mailer/**/*.erb"
+  - "spec/mailers/**/*.rb"
 ---
 
 # Mailer Conventions

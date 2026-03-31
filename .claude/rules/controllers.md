@@ -1,5 +1,7 @@
 ---
-globs: "app/controllers/**/*.rb, spec/requests/**/*.rb"
+paths:
+  - "app/controllers/**/*.rb"
+  - "spec/requests/**/*.rb"
 ---
 
 # Controller Conventions

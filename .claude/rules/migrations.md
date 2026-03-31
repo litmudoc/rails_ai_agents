@@ -1,5 +1,7 @@
 ---
-globs: "db/migrate/**/*.rb, db/schema.rb"
+paths:
+  - "db/migrate/**/*.rb"
+  - "db/schema.rb"
 ---
 
 # Migration Conventions

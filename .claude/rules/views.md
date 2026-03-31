@@ -1,5 +1,11 @@
 ---
-globs: "app/views/**/*.erb, app/components/**/*.rb, app/components/**/*.erb, spec/components/**/*.rb, app/presenters/**/*.rb, spec/presenters/**/*.rb"
+paths:
+  - "app/views/**/*.erb"
+  - "app/components/**/*.rb"
+  - "app/components/**/*.erb"
+  - "spec/components/**/*.rb"
+  - "app/presenters/**/*.rb"
+  - "spec/presenters/**/*.rb"
 ---
 
 # View & Component Conventions

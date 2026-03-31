@@ -1,5 +1,7 @@
 ---
-globs: "app/jobs/**/*.rb, spec/jobs/**/*.rb"
+paths:
+  - "app/jobs/**/*.rb"
+  - "spec/jobs/**/*.rb"
 ---
 
 # Background Job Conventions

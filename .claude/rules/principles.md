@@ -1,7 +1,3 @@
----
-globs: "app/**/*.rb"
----
-
 # Development Principles
 
 - **KISS**: Prefer standard CRUD controllers and conventional routing. No abstractions until complexity demands it. If a junior developer can't understand it in 30 seconds, simplify it.

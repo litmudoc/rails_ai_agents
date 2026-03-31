@@ -1,5 +1,7 @@
 ---
-globs: "app/**/*.rb, spec/**/*.rb"
+paths:
+  - "app/**/*.rb"
+  - "spec/**/*.rb"
 ---
 
 # Anti-Patterns to Avoid

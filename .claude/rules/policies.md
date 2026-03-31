@@ -1,5 +1,7 @@
 ---
-globs: "app/policies/**/*.rb, spec/policies/**/*.rb"
+paths:
+  - "app/policies/**/*.rb"
+  - "spec/policies/**/*.rb"
 ---
 
 # Pundit Policy Conventions

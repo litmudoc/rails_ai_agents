@@ -1,5 +1,7 @@
 ---
-globs: "app/services/**/*.rb, spec/services/**/*.rb"
+paths:
+  - "app/services/**/*.rb"
+  - "spec/services/**/*.rb"
 ---
 
 # Service Object Conventions

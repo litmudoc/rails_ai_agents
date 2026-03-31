@@ -1,5 +1,6 @@
 ---
-globs: "spec/**/*.rb"
+paths:
+  - "spec/**/*.rb"
 ---
 
 # Testing Conventions

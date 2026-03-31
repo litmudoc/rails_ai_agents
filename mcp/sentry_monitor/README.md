@@ -72,7 +72,7 @@ List unresolved Sentry issues with filtering and pagination.
 | `query` | `is:unresolved` | Sentry search syntax |
 | `sort_by` | `date` | `date`, `freq`, `new`, `priority` |
 | `environment` | all | Filter by environment (e.g., `production`) |
-| `date_range` | `14d` | `24h`, `7d`, `14d`, `30d` |
+| `date_range` | `14d` | `24h` or `14d` |
 | `page_size` | 25 | Max 100 |
 | `cursor` | — | Pagination cursor from previous response |
 
@@ -153,12 +153,14 @@ These Claude Code skills (installed separately in your project's `.claude/skills
 | `/sentry:fix-error` | Launch a background agent in an isolated git worktree to implement a fix |
 | `/sentry:fix-status` | List active fix branches, merge or discard completed ones |
 | `/sentry:resolve` | Resolve, ignore, or reopen a Sentry issue after a fix is deployed |
+| `/sentry:report` | Generate a markdown error summary for standups, PRs, or sprint reviews |
 
 Usage:
 ```
 /loop 10m /sentry:monitor          # Check for new errors every 10 minutes
 /sentry:fix-error 12345 Add nil check in payment_service.rb
 /sentry:fix-status                 # Review and manage fix branches
+/sentry:report 7d production        # Error summary for standups/PRs
 /loop --cancel              # Stop the fix-error loop
 ```
 

@@ -80,7 +80,7 @@ async def list_issues(
         query: Sentry search query (e.g., "is:unresolved level:error").
         sort_by: Sort order: "date", "freq", "new", or "priority".
         environment: Filter by environment (e.g., "production").
-        date_range: Stats period: "24h", "7d", "14d", "30d".
+        date_range: Stats period: "24h" or "14d".
         page_size: Number of issues per page (max 100).
         cursor: Pagination cursor from a previous response.
     """

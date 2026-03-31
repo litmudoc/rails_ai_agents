@@ -1,6 +1,6 @@
 # Rails AI Agents
 
-A production-ready Claude Code setup for Ruby on Rails development: **18 specialized agents**, **20 slash commands** (including the [SDD kit](#spec-driven-development-sdd-kit)), **13 skills**, **12 path-scoped rules**, and **6 lifecycle hooks**. Drop it into your project and your AI assistant instantly knows Rails conventions, TDD workflows, and production patterns.
+A production-ready Claude Code setup for Ruby on Rails development: **18 specialized agents**, **23 slash commands** (including the [SDD kit](#spec-driven-development-sdd-kit)), **13 skills**, **12 path-scoped rules**, **1 MCP**, and **6 lifecycle hooks**. Drop it into your project and your AI assistant instantly knows Rails conventions, TDD workflows, and production patterns.
 
 Also includes:
 - [Spec Driven Development (SDD) kit](#spec-driven-development-sdd-kit) — a full specification-to-implementation pipeline + lightweight mode for bug fixes.
@@ -215,6 +215,14 @@ For bug fixes and small features that don't need the full SDD ceremony. Three co
 | Refactor touching 6+ files | `/sdd:specify` |
 
 The lightweight pipeline warns you if your change looks too complex (>3 acceptance criteria or >6 files affected) and suggests switching to the full pipeline.
+
+## MCP Servers (`mcp/`)
+
+Custom MCP servers that extend Claude Code with external integrations.
+
+| Server | Purpose | Docs |
+|--------|---------|------|
+| [`sentry_monitor`](mcp/sentry_monitor/) | Exposes Sentry production errors as Claude Code tools — query issues, map stack traces to local files, detect new errors with persistent state tracking, PII redaction by default | [README](mcp/sentry_monitor/README.md) |
 
 ## Documentation
 

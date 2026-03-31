@@ -49,6 +49,18 @@ def _validate_slug(slug: str) -> str:
     return slug
 
 
+VALID_STATUSES = {"resolved", "ignored", "unresolved"}
+
+
+def _validate_status(status: str) -> str:
+    """Validate that status is an allowed Sentry issue status."""
+    if status not in VALID_STATUSES:
+        raise ValueError(
+            f"Invalid status '{status}'. Must be one of: {', '.join(sorted(VALID_STATUSES))}"
+        )
+    return status
+
+
 class SentryClient:
     def __init__(self, config: SentryConfig):
         self.config = config
@@ -143,6 +155,25 @@ class SentryClient:
         org = _validate_slug(self.config.org)
         path = f"/organizations/{org}/issues/{issue_id}/events/latest/"
         response = await self._request("GET", path)
+        return response.json()
+
+    async def update_issue_status(
+        self,
+        issue_id: str,
+        status: str,
+        status_details: dict | None = None,
+    ) -> dict:
+        """Update the status of a Sentry issue (resolve, ignore, or reopen)."""
+        _validate_issue_id(issue_id)
+        _validate_status(status)
+        org = _validate_slug(self.config.org)
+        path = f"/organizations/{org}/issues/{issue_id}/"
+
+        body: dict = {"status": status}
+        if status_details:
+            body["statusDetails"] = status_details
+
+        response = await self._request("PUT", path, json=body)
         return response.json()
 
     async def validate_auth(self) -> bool:

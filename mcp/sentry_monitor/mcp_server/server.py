@@ -274,6 +274,59 @@ async def get_server_status(ctx: Context) -> str:
     )
 
 
+@mcp.tool()
+async def resolve_issue(
+    ctx: Context,
+    issue_id: str,
+    status: str = "resolved",
+    in_next_release: bool = False,
+    in_commit: str = "",
+    in_repository: str = "",
+    ignore_duration: int = 0,
+) -> str:
+    """Update the status of a Sentry issue (resolve, ignore, or reopen).
+
+    Args:
+        issue_id: Sentry issue ID (numeric string).
+        status: New status: "resolved", "ignored", or "unresolved".
+        in_next_release: If True, resolve in the next release (only with status="resolved").
+        in_commit: Commit SHA to resolve in (only with status="resolved", requires in_repository).
+        in_repository: Repository as "org/repo" for commit-based resolution.
+        ignore_duration: Minutes to ignore the issue (only with status="ignored").
+    """
+    client = _get_client()
+    await ctx.info(f"Updating issue {issue_id} status to '{status}'")
+
+    try:
+        # Build statusDetails from flat parameters
+        status_details: dict | None = None
+
+        if in_next_release and status == "resolved":
+            status_details = {"inNextRelease": True}
+        elif in_commit and status == "resolved":
+            if not in_repository:
+                return json.dumps({"error": "in_repository is required when using in_commit"})
+            status_details = {"inCommit": {"commit": in_commit, "repository": in_repository}}
+        elif ignore_duration > 0 and status == "ignored":
+            status_details = {"ignoreDuration": ignore_duration}
+
+        result = await client.update_issue_status(
+            issue_id=issue_id,
+            status=status,
+            status_details=status_details,
+        )
+    except (SentryAPIError, ValueError) as e:
+        return json.dumps({"error": str(e)})
+
+    return json.dumps({
+        "issue_id": result.get("id", issue_id),
+        "status": result.get("status", status),
+        "status_details": result.get("statusDetails", {}),
+        "short_id": result.get("shortId", ""),
+        "title": result.get("title", ""),
+    })
+
+
 DEFAULT_STATE_DIR = os.path.abspath(".claude")
 DEFAULT_STATE_FILE = os.path.join(DEFAULT_STATE_DIR, "sentry-monitor-state.json")
 

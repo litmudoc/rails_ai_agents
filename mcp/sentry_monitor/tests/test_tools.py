@@ -13,9 +13,11 @@ import respx
 from tests.conftest import (
     LINK_HEADER_NO_NEXT,
     LINK_HEADER_WITH_NEXT,
+    MOCK_IGNORE_RESPONSE,
     MOCK_ISSUE_DETAIL,
     MOCK_ISSUE_LIST,
     MOCK_LATEST_EVENT,
+    MOCK_RESOLVE_RESPONSE,
 )
 
 # Reset global state before importing server module
@@ -220,6 +222,84 @@ class TestGetServerStatusTool:
             result = json.loads(await get_server_status(mock_ctx))
 
         assert result["status"] == "misconfigured"
+        assert "error" in result
+
+
+class TestResolveIssueTool:
+    async def test_resolves_issue(self, mock_ctx):
+        from mcp_server.server import resolve_issue
+
+        with respx.mock(base_url="https://sentry.io/api/0") as mock:
+            mock.put("/organizations/test-org/issues/12345/").mock(
+                return_value=httpx.Response(200, json=MOCK_RESOLVE_RESPONSE)
+            )
+
+            result = json.loads(await resolve_issue(mock_ctx, issue_id="12345"))
+
+        assert result["status"] == "resolved"
+        assert result["issue_id"] == "12345"
+        assert result["short_id"] == "TEST-PROJECT-1"
+
+    async def test_resolve_in_next_release(self, mock_ctx):
+        from mcp_server.server import resolve_issue
+
+        with respx.mock(base_url="https://sentry.io/api/0") as mock:
+            route = mock.put("/organizations/test-org/issues/12345/").mock(
+                return_value=httpx.Response(200, json=MOCK_RESOLVE_RESPONSE)
+            )
+
+            await resolve_issue(mock_ctx, issue_id="12345", in_next_release=True)
+
+            body = json.loads(route.calls[0].request.content)
+            assert body["statusDetails"]["inNextRelease"] is True
+
+    async def test_ignore_with_duration(self, mock_ctx):
+        from mcp_server.server import resolve_issue
+
+        with respx.mock(base_url="https://sentry.io/api/0") as mock:
+            route = mock.put("/organizations/test-org/issues/12345/").mock(
+                return_value=httpx.Response(200, json=MOCK_IGNORE_RESPONSE)
+            )
+
+            result = json.loads(
+                await resolve_issue(
+                    mock_ctx, issue_id="12345", status="ignored", ignore_duration=60
+                )
+            )
+
+            body = json.loads(route.calls[0].request.content)
+            assert body["status"] == "ignored"
+            assert body["statusDetails"]["ignoreDuration"] == 60
+            assert result["status"] == "ignored"
+
+    async def test_in_commit_requires_repository(self, mock_ctx):
+        from mcp_server.server import resolve_issue
+
+        result = json.loads(
+            await resolve_issue(mock_ctx, issue_id="12345", in_commit="abc123")
+        )
+
+        assert "error" in result
+        assert "in_repository is required" in result["error"]
+
+    async def test_invalid_status(self, mock_ctx):
+        from mcp_server.server import resolve_issue
+
+        result = json.loads(await resolve_issue(mock_ctx, issue_id="12345", status="deleted"))
+
+        assert "error" in result
+        assert "Invalid status" in result["error"]
+
+    async def test_error_handling(self, mock_ctx):
+        from mcp_server.server import resolve_issue
+
+        with respx.mock(base_url="https://sentry.io/api/0") as mock:
+            mock.put("/organizations/test-org/issues/99999/").mock(
+                return_value=httpx.Response(404, text="Not found")
+            )
+
+            result = json.loads(await resolve_issue(mock_ctx, issue_id="99999"))
+
         assert "error" in result
 
 

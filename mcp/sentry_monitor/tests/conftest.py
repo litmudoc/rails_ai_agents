@@ -182,6 +182,22 @@ MOCK_LATEST_EVENT = {
     },
 }
 
+MOCK_RESOLVE_RESPONSE = {
+    "id": "12345",
+    "shortId": "TEST-PROJECT-1",
+    "title": "TypeError: Cannot read property 'x' of undefined",
+    "status": "resolved",
+    "statusDetails": {},
+}
+
+MOCK_IGNORE_RESPONSE = {
+    "id": "12345",
+    "shortId": "TEST-PROJECT-1",
+    "title": "TypeError: Cannot read property 'x' of undefined",
+    "status": "ignored",
+    "statusDetails": {"ignoreDuration": 60},
+}
+
 LINK_HEADER_WITH_NEXT = (
     "<https://sentry.io/api/0/projects/test-org/test-project/issues/?cursor=abc123>; "
     'rel="previous"; results="false"; cursor="abc123", '

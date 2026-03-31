@@ -27,7 +27,7 @@ SENTRY_ORG=your-org-slug
 SENTRY_PROJECT=your-default-project-slug
 ```
 
-Your token needs scopes: `project:read`, `event:read`, `org:read`.
+Your token needs scopes: `project:read`, `project:write`, `event:read`, `org:read`.
 
 ### 3. Register with Claude Code
 
@@ -115,6 +115,21 @@ Check for new errors since the last poll. Maintains persistent state in `.claude
 
 State is pruned of entries older than 30 days. Corrupted state files are reset with a warning.
 
+### `resolve_issue`
+
+Update the status of a Sentry issue (resolve, ignore, or reopen). This is the only write operation — all other tools are read-only.
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `issue_id` | required | Sentry issue ID |
+| `status` | `resolved` | `resolved`, `ignored`, or `unresolved` |
+| `in_next_release` | `false` | Resolve in the next release |
+| `in_commit` | — | Commit SHA to resolve in (requires `in_repository`) |
+| `in_repository` | — | Repository as `org/repo` for commit-based resolution |
+| `ignore_duration` | `0` | Minutes to ignore the issue |
+
+Requires `project:write` token scope.
+
 ### `get_server_status`
 
 Health check — verifies Sentry connection, token validity, and state file status. No parameters.
@@ -137,6 +152,7 @@ These Claude Code skills (installed separately in your project's `.claude/skills
 | `/sentry:monitor` | Single monitoring cycle: detect new errors, analyze stack traces, propose fixes |
 | `/sentry:fix-error` | Launch a background agent in an isolated git worktree to implement a fix |
 | `/sentry:fix-status` | List active fix branches, merge or discard completed ones |
+| `/sentry:resolve` | Resolve, ignore, or reopen a Sentry issue after a fix is deployed |
 
 Usage:
 ```
@@ -150,7 +166,7 @@ Usage:
 
 ```
 mcp_server/
-├── server.py           # FastMCP entry point, 5 tool definitions
+├── server.py           # FastMCP entry point, 6 tool definitions
 ├── sentry_client.py    # Async Sentry REST API client (httpx)
 ├── redactor.py         # PII field redaction
 ├── path_mapper.py      # Stack trace path → local file mapping

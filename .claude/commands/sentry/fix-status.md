@@ -40,6 +40,13 @@ List all active fix branches created by `/sentry:fix-error`, show their status, 
    2. If merge succeeds: run `git worktree remove {worktree_path}`
    3. If merge conflicts: report the conflicts and let the developer resolve manually
 
+   4. Suggest resolving the Sentry issue:
+      ```
+      Fix merged. Resolve this issue in Sentry?
+      Use: /sentry:resolve {issue_id}
+      ```
+      Extract the issue ID from the branch name (`fix/SENTRY-{short_id}-*`).
+
    **Discard**:
    1. Run `git worktree remove {worktree_path} --force`
    2. Run `git branch -D {branch_name}`

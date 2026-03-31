@@ -14,9 +14,11 @@ from mcp_server.sentry_client import (
 from tests.conftest import (
     LINK_HEADER_NO_NEXT,
     LINK_HEADER_WITH_NEXT,
+    MOCK_IGNORE_RESPONSE,
     MOCK_ISSUE_DETAIL,
     MOCK_ISSUE_LIST,
     MOCK_LATEST_EVENT,
+    MOCK_RESOLVE_RESPONSE,
 )
 
 
@@ -112,6 +114,68 @@ class TestGetLatestEvent:
         result = await sentry_client.get_latest_event("12345")
         assert result["eventID"] == "evt-abc123"
         assert len(result["entries"]) == 3
+
+
+class TestUpdateIssueStatus:
+    async def test_resolves_issue(self, sentry_client: SentryClient, mock_sentry):
+        mock_sentry.put("/organizations/test-org/issues/12345/").mock(
+            return_value=httpx.Response(200, json=MOCK_RESOLVE_RESPONSE)
+        )
+
+        result = await sentry_client.update_issue_status("12345", "resolved")
+        assert result["status"] == "resolved"
+        assert result["id"] == "12345"
+
+    async def test_ignores_issue(self, sentry_client: SentryClient, mock_sentry):
+        mock_sentry.put("/organizations/test-org/issues/12345/").mock(
+            return_value=httpx.Response(200, json=MOCK_IGNORE_RESPONSE)
+        )
+
+        result = await sentry_client.update_issue_status(
+            "12345", "ignored", status_details={"ignoreDuration": 60}
+        )
+        assert result["status"] == "ignored"
+
+    async def test_sends_correct_body(self, sentry_client: SentryClient, mock_sentry):
+        import json
+
+        route = mock_sentry.put("/organizations/test-org/issues/12345/").mock(
+            return_value=httpx.Response(200, json=MOCK_RESOLVE_RESPONSE)
+        )
+
+        await sentry_client.update_issue_status(
+            "12345", "resolved", status_details={"inNextRelease": True}
+        )
+
+        request = route.calls[0].request
+        body = json.loads(request.content)
+        assert body["status"] == "resolved"
+        assert body["statusDetails"]["inNextRelease"] is True
+
+    async def test_invalid_status_rejected(self, sentry_client: SentryClient, mock_sentry):
+        with pytest.raises(ValueError, match="Invalid status"):
+            await sentry_client.update_issue_status("12345", "deleted")
+
+    async def test_invalid_issue_id_rejected(self, sentry_client: SentryClient, mock_sentry):
+        with pytest.raises(ValueError, match="Invalid issue_id"):
+            await sentry_client.update_issue_status("abc", "resolved")
+
+    async def test_not_found(self, sentry_client: SentryClient, mock_sentry):
+        mock_sentry.put("/organizations/test-org/issues/99999/").mock(
+            return_value=httpx.Response(404, text="Not found")
+        )
+
+        with pytest.raises(SentryAPIError) as exc_info:
+            await sentry_client.update_issue_status("99999", "resolved")
+        assert exc_info.value.status_code == 404
+
+    async def test_auth_error(self, sentry_client: SentryClient, mock_sentry):
+        mock_sentry.put("/organizations/test-org/issues/12345/").mock(
+            return_value=httpx.Response(401, text="Unauthorized")
+        )
+
+        with pytest.raises(SentryAuthError):
+            await sentry_client.update_issue_status("12345", "resolved")
 
 
 class TestErrorHandling:
@@ -219,6 +283,22 @@ class TestInputValidation:
 
         with pytest.raises(ValueError, match="Invalid slug"):
             _validate_slug("")
+
+    def test_valid_status(self):
+        from mcp_server.sentry_client import _validate_status
+
+        assert _validate_status("resolved") == "resolved"
+        assert _validate_status("ignored") == "ignored"
+        assert _validate_status("unresolved") == "unresolved"
+
+    def test_invalid_status(self):
+        from mcp_server.sentry_client import _validate_status
+
+        with pytest.raises(ValueError, match="Invalid status"):
+            _validate_status("deleted")
+
+        with pytest.raises(ValueError, match="Invalid status"):
+            _validate_status("")
 
     def test_rate_limit_non_integer_retry_after(self):
         """Malformed Retry-After header should fall back to 60s, not crash."""

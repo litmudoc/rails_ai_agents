@@ -1,6 +1,6 @@
 # Rails AI Agents
 
-A production-ready Claude Code setup for Ruby on Rails development: **18 specialized agents**, **23 slash commands** (including the [SDD kit](#spec-driven-development-sdd-kit)), **13 skills**, **12 path-scoped rules**, **1 MCP**, and **6 lifecycle hooks**. Drop it into your project and your AI assistant instantly knows Rails conventions, TDD workflows, and production patterns.
+A production-ready Claude Code setup for Ruby on Rails development: **18 specialized agents**, **24 slash commands** (including the [SDD kit](#spec-driven-development-sdd-kit)), **13 skills**, **12 path-scoped rules**, **1 MCP**, and **6 lifecycle hooks**. Drop it into your project and your AI assistant instantly knows Rails conventions, TDD workflows, and production patterns.
 
 Also includes:
 - [Spec Driven Development (SDD) kit](#spec-driven-development-sdd-kit) — a full specification-to-implementation pipeline + lightweight mode for bug fixes.
@@ -45,7 +45,7 @@ cp -r .claude/ /path/to/your-rails-app/.claude/
 
 ### Commands (`.claude/commands/`)
 
-6 standalone slash commands for feature development workflows. See also [SDD commands](#sdd-commands-claudecommandssdd) below.
+7 standalone slash commands for feature development workflows. See also [SDD commands](#sdd-commands-claudecommandssdd) below.
 
 | Command | Purpose |
 |---|---|
@@ -55,6 +55,7 @@ cp -r .claude/ /path/to/your-rails-app/.claude/
 | `/feature-tdd-implementation` | Guides full Red-Green-Refactor TDD workflow |
 | `/frame-problem` | Reframes vague requests into clear problems |
 | `/prompt-improver` | Scores and rewrites vague prompts into specific, actionable ones |
+| `/catchup` | "Welcome back" report on a feature branch — commits, authors, themes, and risks since the dev's last contribution |
 
 ### Skills (`.claude/skills/`)
 

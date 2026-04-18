@@ -172,7 +172,7 @@ MOCK_LATEST_EVENT = {
     ],
     "contexts": {
         "os": {"name": "macOS", "version": "14.0"},
-        "runtime": {"name": "Ruby", "version": "3.3.6"},
+        "runtime": {"name": "Ruby", "version": "3.3.11"},
     },
     "user": {
         "id": "789",

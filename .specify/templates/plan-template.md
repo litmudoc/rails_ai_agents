@@ -11,7 +11,7 @@
 
 ## Technical Context
 
-**Language/Version**: Ruby 3.3.6, Rails 8.1.3
+**Language/Version**: Ruby 3.3.11, Rails 8.1.3
 **Primary Dependencies**: Hotwire (Turbo + Stimulus), ImportMap, Propshaft, SQLite3
 **Storage**: SQLite3 (primary, cache via Solid Cache, queue via Solid Queue, cable via Solid Cable)
 **Testing**: Minitest (unit/integration), Capybara + Selenium (system tests)

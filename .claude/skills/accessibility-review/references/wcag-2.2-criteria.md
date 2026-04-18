@@ -98,7 +98,7 @@ Techniques & failures: <https://www.w3.org/WAI/WCAG22/Techniques/>.
 | 3.3.3   | Error Suggestion                   | AA | Suggest a fix when you know one. |
 | 3.3.4   | Error Prevention (Legal/Financial) | AA | Review + confirm + reverse. |
 | 3.3.5   | Help                               | AAA| |
-| 3.3.6   | Error Prevention (All)             | AAA| |
+| 3.3.11   | Error Prevention (All)             | AAA| |
 | 3.3.7🆕 | Redundant Entry                    | A  | Re-use previously entered data in the same session. |
 | 3.3.8🆕 | Accessible Authentication (Min.)   | AA | No cognitive tests (remember code, transcribe image). |
 | 3.3.9🆕 | Accessible Authentication (Enh.)   | AAA| No object recognition either. |

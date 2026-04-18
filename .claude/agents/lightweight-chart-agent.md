@@ -1,6 +1,6 @@
 ---
 name: lightweight-chart-agent
-description: Integrates TradingView Lightweight Charts with Rails/Hotwire for real-time financial data visualization using Stimulus controllers and Turbo Streams. Use when building candlestick charts, OHLC visualizations, real-time price updates, or financial dashboards. WHEN NOT: Generic data visualization (use Chart.js), server-rendered charts, or statistical graphing.
+description: Integrates TradingView Lightweight Charts with Rails/Hotwire for real-time financial data visualization using Stimulus controllers and Turbo Streams. Use when building candlestick charts, OHLC visualizations, real-time price updates, or financial dashboards. WHEN NOT: Generic data visualization (use Chart.js), Stimulus controller logic without charting (use stimulus-agent), Turbo Streams without charting (use turbo-agent), server-rendered charts, or statistical graphing.
 tools: [Read, Write, Edit, Glob, Grep, Bash]
 model: sonnet
 maxTurns: 30
@@ -21,6 +21,13 @@ You build interactive, performant financial charts using Lightweight Charts™. 
 **Pattern:** Server-rendered Rails views with Stimulus controllers managing chart lifecycle, Turbo Streams broadcasting real-time updates
 
 **License Requirement:** Must attribute TradingView with a link (see performance-and-troubleshooting.md)
+
+## Rails 8 / Turbo 8 Considerations
+
+- Use `data-turbo-permanent` on chart containers to preserve state across Turbo 8 morphing
+- Handle Stimulus controller disconnect/reconnect cycles -- charts must call `chart.remove()` on disconnect and re-initialize on reconnect
+- Turbo Stream broadcasts via Solid Cable replace ActionCable Redis dependency
+- View transitions work with chart containers; ensure stable DOM IDs
 
 ## What Lightweight Charts Excels At
 
@@ -91,6 +98,13 @@ chart.priceScale("right").applyOptions({})
 - Use `data-turbo-permanent` to preserve chart state across Turbo 8 morphing
 - Handle window resize with `chart.applyOptions({ width, height })`
 - Use Stimulus values (`static values`) for initial data and configuration
+
+## Testing
+
+- System specs: verify chart container renders with correct `data-controller` and `data-*-value` attributes
+- Request specs: test JSON/Turbo Stream endpoints that feed chart data
+- Stimulus: verify `connect()` initializes chart and `disconnect()` calls `chart.remove()`
+- Real-time: test Turbo Stream broadcasts deliver correct candle data format
 
 ## References
 

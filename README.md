@@ -1,6 +1,6 @@
 # Rails AI Agents
 
-A production-ready Claude Code setup for Ruby on Rails development: **18 specialized agents**, **24 slash commands** (including the [SDD kit](#spec-driven-development-sdd-kit)), **14 skills**, **12 path-scoped rules**, **1 MCP**, and **6 lifecycle hooks**. Drop it into your project and your AI assistant instantly knows Rails conventions, TDD workflows, and production patterns.
+A production-ready Claude Code setup for Ruby on Rails development: **19 specialized agents**, **24 slash commands** (including the [SDD kit](#spec-driven-development-sdd-kit)), **14 skills**, **12 path-scoped rules**, **1 MCP**, and **6 lifecycle hooks**. Drop it into your project and your AI assistant instantly knows Rails conventions, TDD workflows, and production patterns.
 
 Also includes:
 - [Spec Driven Development (SDD) kit](#spec-driven-development-sdd-kit) — a full specification-to-implementation pipeline + lightweight mode for bug fixes.
@@ -20,7 +20,7 @@ cp -r .claude/ /path/to/your-rails-app/.claude/
 
 ### Agents (`.claude/agents/`)
 
-18 specialist agents, each with `permissionMode: acceptEdits`, `memory: project`, `maxTurns` limits, and WHEN/WHEN NOT descriptions for auto-delegation.
+19 specialist agents, each with `permissionMode: acceptEdits`, `memory: project`, `maxTurns` limits, and WHEN/WHEN NOT descriptions for auto-delegation.
 
 | Agent | Domain | Model |
 |---|---|---|
@@ -37,6 +37,7 @@ cp -r .claude/ /path/to/your-rails-app/.claude/
 | `mailer-agent` | ActionMailer with previews and templates | sonnet |
 | `turbo-agent` | Turbo Frames, Streams, Drive | sonnet |
 | `stimulus-agent` | Stimulus controllers | sonnet |
+| `lightweight-chart-agent` | TradingView Lightweight Charts with Turbo Streams real-time updates | sonnet |
 | `tailwind-agent` | Tailwind CSS styling | sonnet |
 | `rspec-agent` | RSpec tests | sonnet |
 | `implementation-agent` | TDD GREEN phase orchestrator (worktree isolation) | sonnet |

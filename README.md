@@ -26,6 +26,22 @@ cp -r .claude/ /path/to/your-rails-app/.claude/
 
 `.specify/` is optional unless you want the SDD workflow. `.claude_37signals/` is currently a conventions pack (instructions, agents, skills, rules, settings), while the slash-command set documented below lives under `.claude/commands/`.
 
+## OpenAI Codex Support
+
+This repo also includes a practical Codex setup:
+
+- `AGENTS.md` is the Codex-facing project instruction file. It mirrors the main Rails conventions so Codex gets the same architectural guidance as Claude Code.
+- `.agents/skills/` is the Codex-visible skills directory for this repo.
+- `.claude/skills/` remains the canonical source for shared skills in this project.
+
+Because Codex skill discovery is currently unreliable with symlinks, this repo includes a local sync script that copies Claude skills into real directories for Codex:
+
+```bash
+scripts/sync_claude_skills_to_codex.sh
+```
+
+Run it after changing a skill in `.claude/skills/`. If Codex is already running, restart or reload it so it picks up the updated mirrored skills.
+
 ## What's Inside
 
 ### Agents (`.claude/agents/`)

@@ -9,6 +9,13 @@ Also includes:
 - and more!
 
 
+## Latest Updates
+
+- Add review artifact command.
+- Add PR artifact command.
+- Add plan artifact command.
+- Add tmux session launcher script for Rails development.
+
 ## Quick Start
 
 ```bash

@@ -11,9 +11,8 @@ Also includes:
 
 ## Latest Updates
 
-- Add review artifact command.
-- Add PR artifact command.
-- Add plan artifact command.
+- Add caveman rule with full intensity level (token reduction)
+- Add plan, review, and PR artifact commands.
 - Add tmux session launcher script for Rails development.
 
 ## Quick Start

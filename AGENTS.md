@@ -1,8 +1,13 @@
 # Project Configuration
 
+## Language Rules
+
+- **Code & documentation:** All source code, comments, commit messages, branch names, and markdown files MUST be written in **English**.
+- **User communication:** When asking questions, requesting clarification, or providing status updates to the user, ALWAYS use **Korean (한국어)**.
+
 ## Tech Stack
 
-- **Ruby** 3.3, **Rails** 8.1, **PostgreSQL**
+- **Ruby** 3.3, **Rails** 8.1, **PostgreSQL**, **TimescaleDB**
 - **Frontend:** Hotwire (Turbo + Stimulus), Tailwind CSS 4, ViewComponent
 - **Testing:** RSpec, FactoryBot, Shoulda Matchers, Capybara
 - **Auth:** `has_secure_password` (Rails 8 built-in), Pundit (authorization)
@@ -31,6 +36,10 @@ app/
 ## Key Commands
 
 ```bash
+# Bootstrap the app (PostgreSQL primary; TimescaleDB is wired in afterwards via database.yml).
+# After generation, edit config/database.yml per @docs/multi-db-config.md before first migrate.
+rails new . --css=tailwind --javascript=importmap --database=sqlite3
+
 # Tests
 bundle exec rspec                              # Full suite
 bundle exec rspec spec/path/to_spec.rb         # Specific file

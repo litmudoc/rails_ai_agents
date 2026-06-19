@@ -9,6 +9,7 @@
 
 - **Ruby** 3.3, **Rails** 8.1, **PostgreSQL**, **TimescaleDB**
 - **Frontend:** Hotwire (Turbo + Stimulus), Tailwind CSS 4, ViewComponent
+- **Financial Charting:** TradingView Lightweight Charts via Import Maps
 - **Testing:** RSpec, FactoryBot, Shoulda Matchers, Capybara
 - **Auth:** `has_secure_password` (Rails 8 built-in), Pundit (authorization)
 - **Background Jobs:** Solid Queue (database-backed, no Redis)
@@ -65,6 +66,25 @@ Follow **TDD: Red -> Green -> Refactor**:
 1. **RED:** Write a failing test describing desired behavior
 2. **GREEN:** Write minimal code to pass the test
 3. **REFACTOR:** Improve code structure while keeping tests green
+
+## Agent Routing
+
+Use specialist agents when a task clearly belongs to one implementation domain. Prefer the most specific agent over a general frontend agent.
+
+| Task Type | Agent | Notes |
+|-----------|-------|-------|
+| Candlestick, OHLC, price, volume, market data, or real-time financial dashboards | `lightweight-chart-agent` | Use TradingView Lightweight Charts with Stimulus, Turbo Streams, Solid Cable, and Import Maps. |
+| Generic Stimulus behavior without charting | `stimulus-agent` | Use for client-side interactions that are not chart-specific. |
+| Turbo Frames, Turbo Streams, and partial page updates without charting | `turbo-agent` | Use for HTML-over-the-wire interactions that are not chart-specific. |
+| Reusable UI components | `viewcomponent-agent` | Pair with chart agents only when the chart shell is a reusable component. |
+
+For Lightweight Charts work:
+- Install browser dependencies with `bin/importmap pin lightweight-charts`; do not add npm, yarn, or bundler-based JavaScript tooling.
+- Keep chart initialization in Stimulus controllers and keep data preparation in Rails services, queries, or presenters as appropriate.
+- Use `series.update()` for real-time ticks and reserve `series.setData()` for initial loads or full dataset replacement.
+- Preserve chart DOM stability with stable IDs and `data-turbo-permanent` when Turbo morphing can affect the chart container.
+- Include TradingView attribution wherever Lightweight Charts are rendered.
+- Test rendered chart containers, data attributes, chart data endpoints, Turbo Stream broadcasts, and Stimulus lifecycle cleanup.
 
 ## Core Conventions
 

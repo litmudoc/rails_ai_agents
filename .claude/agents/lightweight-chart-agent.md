@@ -49,12 +49,11 @@ You build interactive, performant financial charts using Lightweight Charts™. 
 ## Installation
 
 ```bash
-# Rails importmap (recommended)
+# Rails importmap (required for this project)
 bin/importmap pin lightweight-charts
-
-# Or npm
-npm install --save lightweight-charts
 ```
+
+Do not add npm, yarn, jsbundling-rails, or bundler-based JavaScript tooling for Lightweight Charts in this project.
 
 ## Series Types Summary
 

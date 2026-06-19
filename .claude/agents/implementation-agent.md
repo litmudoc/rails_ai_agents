@@ -33,6 +33,7 @@ You orchestrate the GREEN phase of TDD (Red -> GREEN -> Refactor). You analyze f
 | @mailer-agent | ActionMailer (HTML/text templates, previews) |
 | @turbo-agent | Turbo Frames/Streams/Drive (HTML-over-the-wire) |
 | @stimulus-agent | Stimulus controllers (accessible JavaScript) |
+| @lightweight-chart-agent | TradingView Lightweight Charts for financial charts and real-time market data |
 | @presenter-agent | Presenters/Decorators (view logic, formatting) |
 | @query-agent | Query objects (complex queries, N+1 prevention) |
 
@@ -53,7 +54,7 @@ When tests span multiple layers, delegate sequentially in this order:
 1. **Database first:** @migration-agent -> @model-agent
 2. **Business logic second:** @service-agent -> @query-agent
 3. **Application layer third:** @controller-agent -> @policy-agent
-4. **Presentation last:** @presenter-agent -> @viewcomponent-agent -> @stimulus-agent
+4. **Presentation last:** @presenter-agent -> @viewcomponent-agent -> @turbo-agent -> @stimulus-agent -> @lightweight-chart-agent
 
 After each subagent completes, run the specific test file to verify progress. If tests still fail, analyze and delegate again.
 
@@ -72,6 +73,7 @@ When all tests pass:
 3. Business Service: @service-agent -> (optional: @query-agent, @job-agent, @mailer-agent) -> tests pass
 4. UI Component:     @viewcomponent-agent -> @stimulus-agent -> tests pass
 5. Background Job:   @job-agent -> @mailer-agent -> tests pass
+6. Financial Chart:  @query-agent -> @controller-agent -> @lightweight-chart-agent -> tests pass
 ```
 
 ## Green Phase Philosophy

@@ -134,12 +134,14 @@ You **MUST** consider the user input before proceeding (if not empty).
    | `app/components/*` | `viewcomponent-agent` |
    | `app/jobs/*` | `job-agent` |
    | `app/mailers/*` | `mailer-agent` |
+   | Lightweight Charts, candlestick/OHLC, market data, or real-time financial chart tasks | `lightweight-chart-agent` |
    | `app/javascript/controllers/*` (Stimulus) | `stimulus-agent` |
    | Turbo Frames/Streams tasks | `turbo-agent` |
    | View styling / Tailwind tasks | `tailwind-agent` |
    | Anything without a clear match | `general-purpose` |
 
    - Choose the specialist by the task's primary output file. If a task spans layers, pick the layer it mostly creates (or split it).
+   - Prefer `lightweight-chart-agent` over `stimulus-agent` or `turbo-agent` when the task includes financial chart rendering, chart lifecycle, chart data formats, or real-time chart updates.
    - **TDD pairing**: route the test task to `rspec-agent` (writes the failing spec), then route the matching implementation task to its layer specialist (makes it pass). The parent runs the spec between the two to confirm RED → GREEN.
    - Fall back to `general-purpose` only when nothing matches.
 

@@ -2,14 +2,13 @@
 name: performance-optimization
 description: >-
   Identifies and fixes Rails performance issues including N+1 queries, slow
-  queries, and memory problems. Use when optimizing queries, fixing N+1 issues,
-  improving response times, or when user mentions performance, slow,
-  optimization, or Bullet gem. WHEN NOT: Caching-specific patterns (use
-  caching-strategies), adding new features, or general code quality
-  improvements unrelated to speed.
-context: fork
-agent: Explore
-allowed-tools: Read, Grep, Glob, Bash
+  queries, memory problems, large payloads, and PostgreSQL/TimescaleDB-backed
+  chart endpoints. Use when optimizing queries, fixing N+1 issues, improving
+  response times, tuning financial candle endpoints, reducing real-time update
+  load, or when user mentions performance, slow, optimization, Bullet gem,
+  EXPLAIN, continuous aggregates, or chart lag. WHEN NOT: Caching-specific
+  patterns (use caching-strategies), adding new features, or general code
+  quality improvements unrelated to speed.
 ---
 
 # Performance Optimization for Rails 8
@@ -22,6 +21,7 @@ Performance optimization focuses on:
 - Memory management
 - Response time improvements
 - Database indexing
+- Financial chart endpoint and TimescaleDB continuous aggregate performance
 
 ## Quick Start
 
@@ -74,6 +74,14 @@ Use `Event.where(...).explain(:analyze)` to inspect query plans. Set up slow que
 
 See [references/query-optimization.md](references/query-optimization.md) for all code examples and patterns.
 
+## Financial Chart and TimescaleDB Performance
+
+For OHLC/candlestick chart endpoints, prefer querying bounded readonly views backed by TimescaleDB continuous aggregates instead of scanning raw ticks in request paths. Use `series.setData()` only for initial/range loads and `series.update()` for real-time updates.
+
+Key patterns: hypertable indexes by instrument/time, payload bounds, visible-range pagination, continuous aggregate refresh policy checks, real-time aggregate settings, late tick/backfill refreshes, and avoiding Ruby/JavaScript OHLC recomputation.
+
+See [references/financial-timeseries.md](references/financial-timeseries.md) for chart endpoint and TimescaleDB performance patterns.
+
 ## Memory Management and Profiling
 
 Use `memory_profiler` to detect memory issues. Prefer `pluck` over loading full AR objects, use `find_each` for streaming, and use `update_all` / `in_batches` for bulk operations.
@@ -96,6 +104,9 @@ See [references/memory-and-profiling.md](references/memory-and-profiling.md) for
 | Missing index on FK | Add index on `*_id` columns |
 | Slow WHERE clause | Add index on filtered column |
 | Loading unused associations | Remove from `includes` |
+| Slow candle chart endpoint | Query continuous aggregate OHLCV view with bounded time range |
+| Chart lag during live updates | Throttle broadcasts and use `series.update()` |
+| Raw tick scan for candles | Add or fix TimescaleDB continuous aggregate |
 
 ## Performance Checklist
 
@@ -106,6 +117,9 @@ See [references/memory-and-profiling.md](references/memory-and-profiling.md) for
 - [ ] Eager loading in controllers
 - [ ] Batch processing for large datasets
 - [ ] Query analysis for slow endpoints
+- [ ] Chart endpoints use bounded time ranges and return only OHLCV columns
+- [ ] TimescaleDB continuous aggregate policies are active for chart timeframes
+- [ ] Real-time chart updates are throttled and avoid full dataset replacement
 
 ## Workflow
 
@@ -119,3 +133,4 @@ See [references/memory-and-profiling.md](references/memory-and-profiling.md) for
 - [references/n-plus-one.md](references/n-plus-one.md) -- N+1 detection, eager loading methods, Bullet config, counter caches, testing patterns
 - [references/query-optimization.md](references/query-optimization.md) -- Column selection, batch processing, indexing strategies, EXPLAIN analysis, slow query logging
 - [references/memory-and-profiling.md](references/memory-and-profiling.md) -- Memory profiler usage, memory-efficient patterns, Rack Mini Profiler setup, deployment checklist
+- [references/financial-timeseries.md](references/financial-timeseries.md) -- TimescaleDB continuous aggregates, chart endpoint payloads, real-time update tuning, and verification queries

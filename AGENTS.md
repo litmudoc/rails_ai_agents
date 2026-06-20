@@ -39,7 +39,7 @@ app/
 ```bash
 # Bootstrap the app (PostgreSQL primary; TimescaleDB is wired in afterwards via database.yml).
 # After generation, edit config/database.yml per @docs/multi-db-config.md before first migrate.
-rails new . --css=tailwind --javascript=importmap --database=sqlite3
+rails new . --css=tailwind --javascript=importmap --database=postgresql
 
 # Tests
 bundle exec rspec                              # Full suite

@@ -123,6 +123,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    | Task target | `subagent_type` |
    |-------------|-----------------|
    | `spec/**` test tasks (TDD RED) | `rspec-agent` |
+   | TimescaleDB hypertables, continuous aggregates, candle rollups, chart read views, or chart query performance | `database-reviewer` |
    | `db/migrate/*` migrations | `migration-agent` |
    | `app/models/*` | `model-agent` |
    | `app/services/*` | `service-agent` |

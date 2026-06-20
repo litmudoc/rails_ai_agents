@@ -69,11 +69,12 @@ Follow **TDD: Red -> Green -> Refactor**:
 
 ## Agent Routing
 
-Use specialist agents when a task clearly belongs to one implementation domain. Prefer the most specific agent over a general frontend agent.
+Use specialist agents when a task clearly belongs to one implementation domain. When delegating with the Claude Agent tool, set `subagent_type` to the agent name listed below. Prefer the most specific agent over a general frontend agent.
 
 | Task Type | Agent | Notes |
 |-----------|-------|-------|
-| Candlestick, OHLC, price, volume, market data, or real-time financial dashboards | `lightweight-chart-agent` | Use TradingView Lightweight Charts with Stimulus, Turbo Streams, Solid Cable, and Import Maps. |
+| Candlestick, OHLC, price, volume, market data, chart timeframe switching, or real-time financial dashboards | `lightweight-chart-agent` | Use TradingView Lightweight Charts with Stimulus, Turbo Streams, Solid Cable, and Import Maps. |
+| Raw ticks, hypertables, continuous aggregates, candle rollups, chart read views, or TimescaleDB migrations | `database-reviewer` | Pair with `lightweight-chart-agent` when chart data storage or query shape changes. |
 | Generic Stimulus behavior without charting | `stimulus-agent` | Use for client-side interactions that are not chart-specific. |
 | Turbo Frames, Turbo Streams, and partial page updates without charting | `turbo-agent` | Use for HTML-over-the-wire interactions that are not chart-specific. |
 | Reusable UI components | `viewcomponent-agent` | Pair with chart agents only when the chart shell is a reusable component. |
@@ -81,6 +82,7 @@ Use specialist agents when a task clearly belongs to one implementation domain. 
 For Lightweight Charts work:
 - Install browser dependencies with `bin/importmap pin lightweight-charts`; do not add npm, yarn, or bundler-based JavaScript tooling.
 - Keep chart initialization in Stimulus controllers and keep data preparation in Rails services, queries, or presenters as appropriate.
+- Query chart history from bounded, readonly PostgreSQL/TimescaleDB OHLCV views; do not compute candle buckets in JavaScript or Ruby request paths.
 - Use `series.update()` for real-time ticks and reserve `series.setData()` for initial loads or full dataset replacement.
 - Preserve chart DOM stability with stable IDs and `data-turbo-permanent` when Turbo morphing can affect the chart container.
 - Include TradingView attribution wherever Lightweight Charts are rendered.

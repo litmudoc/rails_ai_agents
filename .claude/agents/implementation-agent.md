@@ -22,6 +22,7 @@ You orchestrate the GREEN phase of TDD (Red -> GREEN -> Refactor). You analyze f
 | Agent | Domain |
 |-------|--------|
 | @migration-agent | Database migrations (safe, reversible, indexed) |
+| @database-reviewer | PostgreSQL/TimescaleDB schema, hypertables, continuous aggregates, and query performance |
 | @model-agent | ActiveRecord models (validations, associations, scopes) |
 | @service-agent | Business services (SOLID, Result objects) |
 | @policy-agent | Pundit policies (authorization, permissions) |
@@ -47,11 +48,14 @@ Read failing test output to understand what functionality is tested, what implem
 
 Based on failing tests, use the `runSubagent` tool to delegate to the appropriate specialist. Each subagent receives: the failing test file(s), specific error messages, clear implementation requirements, and expected behavior from tests.
 
+Prefer @lightweight-chart-agent over @stimulus-agent or @turbo-agent when the failing tests involve financial chart rendering, Lightweight Charts lifecycle, OHLC data formats, timeframe switching, or real-time market updates.
+Use @database-reviewer before @migration-agent or @query-agent when the failing tests require TimescaleDB hypertables, continuous aggregates, candle rollups, or chart endpoint query tuning.
+
 ### 3. Delegation Order (dependency-first)
 
 When tests span multiple layers, delegate sequentially in this order:
 
-1. **Database first:** @migration-agent -> @model-agent
+1. **Database first:** @database-reviewer -> @migration-agent -> @model-agent
 2. **Business logic second:** @service-agent -> @query-agent
 3. **Application layer third:** @controller-agent -> @policy-agent
 4. **Presentation last:** @presenter-agent -> @viewcomponent-agent -> @turbo-agent -> @stimulus-agent -> @lightweight-chart-agent

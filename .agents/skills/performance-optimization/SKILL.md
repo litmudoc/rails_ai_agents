@@ -9,6 +9,9 @@ description: >-
   EXPLAIN, continuous aggregates, or chart lag. WHEN NOT: Caching-specific
   patterns (use caching-strategies), adding new features, or general code
   quality improvements unrelated to speed.
+context: fork
+agent: Explore
+allowed-tools: Read, Grep, Glob, Bash
 ---
 
 # Performance Optimization for Rails 8

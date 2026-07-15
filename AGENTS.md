@@ -30,7 +30,7 @@ app/
   policies/        # Pundit authorization. Default deny.
   presenters/      # View formatting (SimpleDelegator).
   components/      # ViewComponents (reusable UI with tests).
-  jobs/            # Background jobs (Solid Queue). Must be idempotent.
+  jobs/            # Background jobs (Solid Queue). Must be idempotent. Exception: LiveCandleStreamJob is a sanctioned long-running stream consumer on the dedicated `streaming` queue (see docs/features/01.mvp-binance-realtime-chart.md 4-B).
   mailers/         # Email delivery. Always HTML + text templates.
 ```
 
@@ -73,8 +73,11 @@ Use specialist agents when a task clearly belongs to one implementation domain. 
 
 | Task Type | Agent | Notes |
 |-----------|-------|-------|
-| Candlestick, OHLC, price, volume, market data, chart timeframe switching, or real-time financial dashboards | `lightweight-chart-agent` | Use TradingView Lightweight Charts with Stimulus, Turbo Streams, Solid Cable, and Import Maps. |
-| Raw ticks, hypertables, continuous aggregates, candle rollups, chart read views, or TimescaleDB migrations | `database-reviewer` | Pair with `lightweight-chart-agent` when chart data storage or query shape changes. |
+| Candlestick, OHLC, price, volume, market data, chart timeframe switching, or real-time financial dashboards | `lightweight-chart-agent` | Use TradingView Lightweight Charts with Stimulus and Import Maps. Realtime candle updates use the custom ActionCable `ChartChannel` (single global stream `"chart:candles"`, direct JSON over Solid Cable) — a documented deliberate deviation from the Turbo Streams default (docs/features/01.mvp-binance-realtime-chart.md REQ-4). Do not convert it to Turbo Streams. |
+| Kline hypertables, continuous aggregates, candle rollups, chart read queries, or TimescaleDB migrations | `database-reviewer` | Pair with `lightweight-chart-agent` when chart data storage or query shape changes. |
+| Binance WebSocket kline ingestion (`Binance::KlineStreamClient`, `LiveCandleStreamJob`, `LiveCandleStreamSupervisorJob`, heartbeat/throttle/backfill) | `job-agent` + `service-agent` | `LiveCandleStreamJob` is a sanctioned long-running Solid Queue job on the dedicated `streaming` queue — a deliberate exception to the short-job convention (docs/features/01.mvp-binance-realtime-chart.md 4-B). Do not redesign it into short jobs or Action Cable. |
+| Custom ActionCable channels and broadcasts (`ChartChannel`) | `service-agent` (with `action-cable-patterns` skill) | Direct JSON broadcast from `LiveCandles::IngestService`, never from model callbacks. |
+| Query objects (e.g. `Candles::HistoryQuery`) | `query-agent` | Bounded (most recent 500, returned ascending), timeframe-specific source model selection. |
 | Generic Stimulus behavior without charting | `stimulus-agent` | Use for client-side interactions that are not chart-specific. |
 | Turbo Frames, Turbo Streams, and partial page updates without charting | `turbo-agent` | Use for HTML-over-the-wire interactions that are not chart-specific. |
 | Reusable UI components | `viewcomponent-agent` | Pair with chart agents only when the chart shell is a reusable component. |
@@ -82,11 +85,12 @@ Use specialist agents when a task clearly belongs to one implementation domain. 
 For Lightweight Charts work:
 - Install browser dependencies with `bin/importmap pin lightweight-charts`; do not add npm, yarn, or bundler-based JavaScript tooling.
 - Keep chart initialization in Stimulus controllers and keep data preparation in Rails services, queries, or presenters as appropriate.
-- Query chart history from bounded, readonly PostgreSQL/TimescaleDB OHLCV views; do not compute candle buckets in JavaScript or Ruby request paths.
+- Query chart history through bounded query objects (`Candles::HistoryQuery`: most recent 500, returned ascending) over the 1m `candles` hypertable and the readonly continuous-aggregate models (2m–30m); do not compute candle buckets in JavaScript or in Ruby request paths (server-side SQL bucket aggregation inside the ingestion service is allowed).
 - Use `series.update()` for real-time ticks and reserve `series.setData()` for initial loads or full dataset replacement.
-- Preserve chart DOM stability with stable IDs and `data-turbo-permanent` when Turbo morphing can affect the chart container.
+- Preserve chart DOM stability with stable IDs. The MVP chart page deliberately omits `data-turbo-permanent`: timeframe switching relies on Turbo Frame replacement triggering the Stimulus disconnect()/connect() cycle (docs/features/01.mvp-binance-realtime-chart.md 4-D). Use `data-turbo-permanent` only on pages where Turbo morphing would otherwise destroy the chart.
+- Realtime chart updates are a documented deliberate deviation from the Turbo Streams default: custom ActionCable `ChartChannel`, single global stream `"chart:candles"`, direct JSON payload `{ candle: { symbol, interval, time(epoch sec), open, high, low, close, volume } }`, client-side symbol+interval filtering. Do not convert this to Turbo Streams / `turbo_stream_from`.
 - Include TradingView attribution wherever Lightweight Charts are rendered.
-- Test rendered chart containers, data attributes, chart data endpoints, Turbo Stream broadcasts, and Stimulus lifecycle cleanup.
+- Test rendered chart containers, data attributes, chart data endpoints, `ChartChannel` JSON broadcasts, and Stimulus lifecycle cleanup.
 
 ## Core Conventions
 
@@ -96,7 +100,7 @@ For Lightweight Charts work:
 - **No premature abstraction:** Don't extract until complexity demands it. Three similar lines > wrong abstraction.
 - **Explicit > implicit:** Clear service calls over hidden callbacks. Named methods over metaprogramming.
 
-See @docs/rails-development-principles.md for the complete development principles guide.
+See @docs/archive/rails-development-principles.md for the complete development principles guide.
 
 ## Naming Conventions
 

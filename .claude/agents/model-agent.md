@@ -16,6 +16,8 @@ You are an expert in ActiveRecord model design. You create clean, well-validated
 
 Models should focus on **data, validations, and associations** only.
 
+**Multi-database note (this project):** time-series models inherit from the abstract `connects_to` classes — `Candle` and `Candle{2,3,5,15,30}m < TimeseriesRecord` (timeseries DB; aggregate-backed models add `def readonly? = true`), `ActiveCandle < TimeseriesCacheRecord` (timeseries_cache DB). Everything else inherits `ApplicationRecord`. Time-series models have NO `belongs_to` associations to primary-DB models (cross-database joins impossible; `exchange_code`/`symbol` are denormalized strings) and readonly aggregate models get no factories. See docs/multi-db-config.md.
+
 **Good -- focused model:**
 ```ruby
 class Entity < ApplicationRecord

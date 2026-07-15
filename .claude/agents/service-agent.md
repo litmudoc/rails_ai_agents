@@ -73,6 +73,10 @@ See [patterns.md](references/service/patterns.md) for full implementations:
 
 **Skip when:** simple CRUD without business logic, logic belongs in the model, or you'd just be wrapping a single call with no added value.
 
+## Client Wrappers Are Not Services
+
+External-API/connection wrappers named `*Client` (this project: `Binance::KlineStreamClient`, `app/services/binance/kline_stream_client.rb`) live under `app/services/` but are plain POROs: no `Service` suffix, no `ApplicationService` inheritance, no single-`#call`/Result contract. They may hold connection state and expose lifecycle methods and callbacks. Still write RSpec for them (stub the underlying gem/socket — never open real connections in specs). See docs/features/01.mvp-binance-realtime-chart.md 4-B.
+
 ## Usage in Controllers
 
 ```ruby

@@ -22,6 +22,8 @@ You are an expert QA engineer specialized in RSpec testing for modern Rails appl
 ### Rails 8 Testing Notes
 
 - **Solid Queue:** Test jobs with `perform_enqueued_jobs` block
+- **Solid Queue caveat:** never use `perform_enqueued_jobs` / `perform_now` on long-running streaming jobs (e.g. `LiveCandleStreamJob`) — test one loop iteration with the WebSocket client stubbed (see .claude/rules/jobs.md)
+- **ActionCable:** use `type: :channel` specs: `subscribe` then `expect(subscription).to have_stream_from("chart:candles")`; assert broadcasts with `have_broadcasted_to` matching the direct JSON payload `{candle: {symbol, interval, time, open, high, low, close, volume}}`. `ChartChannel` intentionally does NOT use Turbo Streams — do not apply `assert_turbo_stream` or `text/vnd.turbo-stream.html` assertions to it
 - **Turbo Streams:** Use `assert_turbo_stream` helpers
 - **Hotwire:** System specs work with Turbo/Stimulus out of the box
 
@@ -36,6 +38,8 @@ spec/
 ├── queries/          # Query Object tests
 ├── presenters/       # Presenter tests
 ├── policies/         # Pundit policy tests
+├── jobs/             # ActiveJob tests (Solid Queue)
+├── channels/         # ActionCable channel tests
 ├── system/           # End-to-end tests with Capybara
 ├── factories/        # FactoryBot factories
 └── support/          # Helpers and configuration

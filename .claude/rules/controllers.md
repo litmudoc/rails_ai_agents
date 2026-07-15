@@ -10,6 +10,7 @@ paths:
 - Delegate to service objects for anything beyond simple CRUD
 - Always `authorize` with Pundit on every action
 - Use `policy_scope(Model)` for index queries (multi-tenant isolation)
+- **MVP exception (docs/req/01.mvp.md — DECIDED):** authentication and Pundit enforcement are out of scope. Do not add live `authorize` / `policy_scope` / `authenticate_user!` calls or policy classes yet — reserve the call sites with `# TODO: authenticate_user!` / `# TODO: authorize` comments only.
 - Use strong parameters (`params.require(:x).permit(...)`)
 - Use presenters (`app/presenters/`) for view formatting, not controllers
 - Follow REST conventions: index, show, new, create, edit, update, destroy

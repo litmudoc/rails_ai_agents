@@ -15,3 +15,9 @@ paths:
 - Inject dependencies via constructor for testability
 - Wrap multi-model operations in `ActiveRecord::Base.transaction`
 - Test both success and failure paths with `subject(:result)`
+
+## Exception: client wrappers
+
+- Classes named `*Client` under `app/services/` (e.g. `Binance::KlineStreamClient` in `app/services/binance/kline_stream_client.rb`) are external-API/connection wrappers, not service objects. They do NOT take the `Service` suffix, do NOT inherit `ApplicationService`, are not required to expose a single `#call` returning a Result, and may hold connection state and expose lifecycle methods (connect, subscribe, close, event callbacks). See docs/features/01.mvp-binance-realtime-chart.md 4-B.
+- Everything else in `app/services/` follows the conventions above.
+- Cross-database note: dual-writes spanning `timeseries` and `timeseries_cache` cannot be wrapped in one `ActiveRecord::Base.transaction` — use ordered idempotent upserts instead (see the feature spec).

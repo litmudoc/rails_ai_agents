@@ -78,7 +78,9 @@ export default class extends Controller {
 
 ## Real-Time Updates
 
-### Pattern 1: Turbo Streams (recommended for Rails)
+> **PROJECT OVERRIDE (binding):** For this repo's MVP realtime chart, real-time updates do NOT use Turbo Streams or model-callback broadcasts. Use the custom ActionCable `ChartChannel` (global stream `"chart:candles"`) with direct JSON payloads `{ candle: { symbol, interval, time /* UTC epoch seconds */, open, high, low, close, volume } }`, broadcast from `LiveCandles::IngestService`. The client subscribes once, filters by `symbol` + `interval`, and calls `series.update()`. Pattern 1 below (and Pattern 4 in Common Patterns) is generic library documentation kept for reference only — do not apply it to the chart feature. See docs/features/01.mvp-binance-realtime-chart.md 4-B/4-D.
+
+### Pattern 1: Turbo Streams (generic reference — NOT used for this project's chart; see override above)
 
 **Model:**
 
@@ -441,7 +443,7 @@ export default class extends Controller {
 }
 ```
 
-### Pattern 4: Real-time updates with Turbo Streams + Solid Cable
+### Pattern 4: Real-time updates with Turbo Streams + Solid Cable (generic reference — NOT used for this project's chart; see the Real-Time Updates override)
 
 ```ruby
 # config/routes.rb

@@ -96,5 +96,9 @@ add_index :items, :metadata, using: :gin                   # GIN for JSONB
 ## Migration Checklist
 
 Before: reversible? NOT NULL constraints? indexes? foreign keys? safe for large tables?
-After: `db:migrate` -> `db:rollback` -> `db:migrate` all succeed, `rspec` passes, `git diff db/schema.rb` looks correct.
+After: `db:migrate` -> `db:rollback` -> `db:migrate` all succeed, `rspec` passes, `git diff db/structure.sql` (and `db/timeseries_structure.sql` / `db/timeseries_cache_structure.sql` for those databases) looks correct — this app uses `schema_format = :sql`, there is no `db/schema.rb`.
 Production: no long locks, concurrent indexes, column removal in 2 steps, backfills in jobs.
+
+## Multi-Database (this project)
+
+Three writable databases (see docs/multi-db-config.md): `primary` (`db/migrate`), `timeseries` (`db/timeseries_migrate`), `timeseries_cache` (`db/timeseries_cache_migrate`). Place each migration in the directory matching its database; migrate with `bin/rails db:migrate:timeseries` / `db:migrate:timeseries_cache`. TimescaleDB objects (hypertables, continuous aggregates, retention/refresh policies) are created with raw SQL `execute` in explicit `up`/`down` methods. Time-series tables have NO foreign keys — `exchange_code`/`symbol` are denormalized strings. Hypertable unique indexes must include the `time` partition column. `interval` is a PostgreSQL keyword — quote it as `"interval"` in raw SQL.

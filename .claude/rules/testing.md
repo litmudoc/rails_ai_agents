@@ -13,6 +13,17 @@ paths:
 - Use `context` blocks to group by scenario
 - Use FactoryBot: `build` over `create` when persistence isn't needed
 - Request specs (`spec/requests/`) over controller specs
-- Test authentication AND authorization in request specs
+- Test authentication AND authorization in request specs (MVP exception: auth is out of scope per docs/req/01.mvp.md — skip these assertions and assert routes are publicly reachable until auth lands)
 - Use Shoulda Matchers for validations and associations
 - Run `bundle exec rubocop -a` after writing specs
+
+## Multi-Database Tests (timeseries / timeseries_cache)
+
+- The test environment defines `timeseries` and `timeseries_cache` entries (see docs/multi-db-config.md). `bin/rails db:test:prepare` creates and loads each database from its own structure.sql (`schema_format = :sql`), including the TimescaleDB extension, hypertables, and continuous aggregates — never hand-create these in specs.
+- Rails transactional tests wrap every configured database connection, so `Candle` / `ActiveCandle` writes roll back between examples like primary-DB writes. If a spec must commit outside the wrapping transaction, delete from `candles` / `active_candles` explicitly in an `after` block.
+- Continuous-aggregate models (`Candle2m`…`Candle30m`) are readonly real-time aggregates (`materialized_only = false`): in specs, insert 1m rows into `candles` and query the aggregate model directly. Do not attempt to trigger refresh policies — TimescaleDB background workers do not run during tests.
+
+## ActionCable / Streaming Jobs
+
+- Channel specs use `type: :channel`: `subscribe` then `expect(subscription).to have_stream_from("chart:candles")`; assert broadcasts with `have_broadcasted_to("chart:candles").with(hash_including(candle: ...))`. `ChartChannel` payloads are direct JSON — do not apply Turbo Stream assertions (`assert_turbo_stream`, `text/vnd.turbo-stream.html`) to it.
+- Never run long-running/looping jobs to completion in specs (`perform_now` / `perform_enqueued_jobs` on `LiveCandleStreamJob` will hang) — test one loop iteration with `Binance::KlineStreamClient` stubbed. Specs must never open real WebSocket connections or call Binance.

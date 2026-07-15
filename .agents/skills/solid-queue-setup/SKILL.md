@@ -4,8 +4,9 @@ description: >-
   Configures Solid Queue for background jobs in Rails 8. Use when setting up
   background processing, creating background jobs, configuring job queues,
   or migrating from Sidekiq to Solid Queue. WHEN NOT: Synchronous in-request
-  processing, real-time WebSocket features (use Action Cable), or simple
-  operations that don't need background execution.
+  processing, browser-facing real-time push (use Action Cable; upstream
+  WebSocket stream consumers like LiveCandleStreamJob DO run as Solid Queue
+  jobs), or simple operations that don't need background execution.
 paths: "app/jobs/**/*.rb, config/queue.yml, spec/jobs/**/*.rb"
 ---
 
@@ -38,7 +39,7 @@ bin/rails db:migrate
 ### Configuration
 
 ```yaml
-# config/solid_queue.yml
+# config/queue.yml   (Rails 8 reads queue.yml — NOT solid_queue.yml)
 default: &default
   dispatchers:
     - polling_interval: 1
@@ -61,6 +62,9 @@ production:
     - queues: [low]
       threads: 2
       processes: 1
+    # This project: dedicated worker for the long-running LiveCandleStreamJob
+    # - queues: streaming
+    #   threads: 2
 ```
 
 ### Set as Active Job Adapter
@@ -81,7 +85,7 @@ Solid Queue Setup:
 - [ ] Add solid_queue gem
 - [ ] Run solid_queue:install
 - [ ] Run migrations
-- [ ] Configure queues in solid_queue.yml
+- [ ] Configure queues in config/queue.yml
 - [ ] Set queue adapter in config
 - [ ] Create first job with spec
 - [ ] Test job execution
@@ -167,6 +171,26 @@ ProcessJob.set(queue: :low).perform_later(data)
 SendWelcomeEmailJob.perform_now(user.id)
 ```
 
+## Concurrency Limits
+
+```ruby
+class LiveCandleStreamJob < ApplicationJob
+  queue_as :streaming
+  limits_concurrency to: 1, key: ->(exchange_code) { exchange_code },
+                     duration: 5.minutes, on_conflict: :discard
+end
+```
+
+Honest semantics: the concurrency semaphore is held only for `duration` and then
+expires. For short jobs this is a reliable mutual-exclusion guard; for
+long-running jobs it is best-effort only — after `duration` a duplicate can run.
+The default conflict behavior BLOCKS the conflicting enqueue and runs it after
+the semaphore expires (a delayed duplicate); use `on_conflict: :discard` when a
+supervisor re-enqueues periodically. Never use `limits_concurrency` as the sole
+singleton guarantee for a long-running job; pair it with an application-level
+liveness check (this project: supervisor + `exchanges.stream_heartbeat_at`
+freshness) and idempotent writes so duplicates are harmless.
+
 ## Recurring Jobs
 
 ```yaml
@@ -250,12 +274,12 @@ end
 
 ```bash
 # Development (runs in separate terminal)
-bin/rails solid_queue:start
+bin/jobs   # Rails 8 binstub (equivalent: bin/rails solid_queue:start)
 
-# Production (via Procfile)
-# Procfile
+# Via Procfile.dev (this project's convention — docs/features/01.mvp-binance-realtime-chart.md 4-B)
+# Procfile.dev
 web: bin/rails server
-worker: bin/rails solid_queue:start
+jobs: bin/jobs
 ```
 
 ## Monitoring

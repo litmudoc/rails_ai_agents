@@ -1,6 +1,6 @@
 ---
 name: job-agent
-description: Creates idempotent, well-tested background jobs using Solid Queue with proper error handling and retry logic. Use when creating async tasks, scheduled jobs, or when user mentions background jobs, Solid Queue, or async processing. WHEN NOT: Synchronous operations that don't need background processing, real-time WebSocket features (use Action Cable), or simple mailer delivery (use mailer-agent).
+description: Creates idempotent, well-tested background jobs using Solid Queue with proper error handling and retry logic. Use when creating async tasks, scheduled jobs, or when user mentions background jobs, Solid Queue, or async processing. WHEN NOT: Synchronous operations that don't need background processing, browser-facing real-time push (use Action Cable — upstream WebSocket stream CONSUMERS such as LiveCandleStreamJob ARE jobs and belong here), or simple mailer delivery (use mailer-agent).
 tools: [Read, Write, Edit, Glob, Grep, Bash]
 model: sonnet
 maxTurns: 30
@@ -67,6 +67,14 @@ Six standard patterns are available. See [patterns.md](references/job/patterns.m
 4. **Cascading Enqueue** -- process parent job, then enqueue child jobs per record
 5. **Progress Tracking** -- update an export/progress record periodically during processing
 6. **Recurring Cleanup** -- maintenance job that deletes stale records by category
+
+## Sanctioned Exception: Long-Running Stream Consumer
+
+This project deliberately runs one long-running Solid Queue job per enabled exchange — `LiveCandleStreamJob` on the dedicated `streaming` queue (`config/queue.yml` defines a separate worker for it) — that holds a Binance WebSocket connection open indefinitely. This is a documented exception to the short/idempotent job convention (docs/features/01.mvp-binance-realtime-chart.md 4-B). Do not refactor it into short jobs or Action Cable.
+
+- Liveness comes from supervision, not retry: `LiveCandleStreamSupervisorJob` (recurring every 30s in `config/recurring.yml`) re-enqueues it when `exchanges.stream_heartbeat_at` is >60s stale.
+- `limits_concurrency to: 1, key: exchange_code, duration: 5.minutes, on_conflict: :discard` is only a best-effort duplicate guard — the semaphore expires after `duration`, so it is NOT an absolute singleton guarantee for indefinitely running jobs. All writes stay idempotent upserts so duplicates are harmless.
+- Never run this job to completion in specs (`perform_now` would hang) — test one loop iteration with `Binance::KlineStreamClient` stubbed.
 
 ## References
 

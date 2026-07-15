@@ -7,6 +7,8 @@ description: PostgreSQL and TimescaleDB schema, indexing, and financial time-ser
 
 Use this skill to keep transactional business data and financial time-series data in one PostgreSQL database without mixing their responsibilities.
 
+> **PROJECT OVERRIDE (PLUS — decided, do not contest):** this app does NOT use the single-database layout below. It runs three logical databases (`primary` PostgreSQL-only; `timeseries` and `timeseries_cache` with TimescaleDB) — see `docs/multi-db-config.md` and `docs/features/01.mvp-binance-realtime-chart.md` 4-A. Ingestion is Binance 1m klines (no raw tick table, no `@trade` streams). Candles are `decimal(20,8)` and higher timeframes (2m/3m/5m/15m/30m) are plain continuous aggregates using `first/max/min/last/sum` — `timescaledb_toolkit`, `candlestick_agg`, `rollup`, and float price columns are NOT used. Cross-database FKs/joins are impossible: `exchange_code`/`symbol` are denormalized strings. Continuous aggregates live only in `timeseries` (same DB as the `candles` hypertable), never in `timeseries_cache`. Where this note conflicts with the generic patterns below, this note wins.
+
 ## Core Split
 
 Use regular PostgreSQL tables for state that requires strict transactional correctness:

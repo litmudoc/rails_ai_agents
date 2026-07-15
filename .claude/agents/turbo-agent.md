@@ -49,6 +49,8 @@ See [turbo-streams.md](references/turbo/turbo-streams.md) for controller pattern
 Model broadcasts push Turbo Streams via ActionCable. Subscribe with `turbo_stream_from`.
 See [broadcasts.md](references/turbo/broadcasts.md) for callbacks and custom patterns.
 
+**Exception — realtime candle chart:** chart updates use the custom ActionCable `ChartChannel` (global stream `"chart:candles"`, direct JSON from `LiveCandles::IngestService`), a documented deliberate deviation. Do not add `turbo_stream_from` or model broadcasts for candle data; the chart's Turbo Frame exists only for timeframe switching via frame replacement (no `data-turbo-permanent` on the chart container). See docs/features/01.mvp-binance-realtime-chart.md 4-B/4-D.
+
 ## Forms with Turbo
 
 ```erb

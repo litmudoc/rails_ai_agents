@@ -50,10 +50,10 @@ psql -c "SELECT indexrelname, idx_scan, idx_tup_read FROM pg_stat_user_indexes O
 
 ### 4. TimescaleDB / Financial Time-Series (HIGH)
 - Keep users, balances, ledgers, orders, positions, and portfolios in regular PostgreSQL tables with ACID transactions
-- Store raw WebSocket ticks and quote/trade observations in append-only hypertables
+- Store incoming market data in append-only hypertables. Note: this project ingests Binance 1m kline candles directly (no raw trade ticks — `@trade`/`@aggTrade` are out of scope); the base hypertable is `timeseries.candles` (closed 1m), with the in-progress rolling window in `timeseries_cache.active_candles` (separate database — no cross-DB FKs/joins; `exchange_code`/`symbol` denormalized; see docs/multi-db-config.md)
 - Verify Rails uses `structure.sql` when migrations create extensions, hypertables, continuous aggregates, or policies
 - Ensure hypertable unique indexes include the partitioning time column
-- Prefer `candlestick_agg` for 1-minute OHLCV and `rollup` for 2/4/5-minute, daily, weekly, and monthly candles
+- Higher timeframes (2m/3m/5m/15m/30m) are continuous aggregates over the 1m `candles` hypertable using plain `first(open, time)/max(high)/min(low)/last(close, time)/sum(volume)` — do not require `candlestick_agg`/`rollup` (timescaledb_toolkit is not installed in this project) and prices are `decimal(20,8)`, not `double precision`
 - Verify continuous aggregates use explicit refresh policies and real-time chart views use `timescaledb.materialized_only = false` when current buckets must be visible
 - Check retention/compression policies against replay, correction, and audit requirements before raw ticks are dropped
 

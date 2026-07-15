@@ -27,6 +27,8 @@ Before planning, verify the spec is ready:
 
 If not reviewed, recommend running `/feature-spec-review` first.
 
+> Exception: a spec explicitly marked final/authoritative by the user (e.g. `docs/features/01.mvp-binance-realtime-chart.md`) counts as reviewed — do not demand `/feature-spec-review` for it, and reuse its existing PR Breakdown as the PR plan baseline.
+
 ## Planning Workflow
 
 ### Step 1: Read and Understand the Feature Spec

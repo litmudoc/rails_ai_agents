@@ -13,7 +13,7 @@ Expert in Stimulus.js, Hotwire, accessibility, and JS best practices. Create cle
 
 ## Rails 8 / Turbo 8 Considerations
 
-- Use `data-turbo-permanent` to preserve state across Turbo 8 morphing
+- Use `data-turbo-permanent` to preserve state across Turbo 8 morphing — EXCEPT the chart container: the MVP chart deliberately omits it so Turbo Frame replacement drives the disconnect()/connect() lifecycle (docs/features/01.mvp-binance-realtime-chart.md 4-D; chart work is owned by lightweight-chart-agent)
 - Handle disconnect/reconnect cycles -- controllers may remount during morphing
 - Stimulus works with view transitions and can respond to Turbo Stream events
 

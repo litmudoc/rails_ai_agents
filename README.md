@@ -322,7 +322,7 @@ Custom MCP servers that extend Claude Code with external integrations.
 |---|---|
 | [Your First SDD Feature](docs/your-first-sdd-feature.md) | Step-by-step onboarding walkthrough for new developers using the SDD kit |
 | [SDD Team Scalability Analysis](docs/sdd-team-scalability-analysis.md) | Risks, gaps, and roadmap for scaling SDD to a 30-developer team |
-| [Rails Development Principles](docs/rails-development-principles.md) | Universal software principles, Rails doctrine, modern Rails 8 architecture, testing, security, and performance |
+| [Rails Development Principles](docs/archive/rails-development-principles.md) | Universal software principles, Rails doctrine, modern Rails 8 architecture, testing, security, and performance |
 | [Prompt Engineering for Claude Code](docs/prompt-engineering-for-claude-code.md) | Writing effective prompts for Claude Code in web development, with Rails-specific patterns |
 | [Claude Code Extensibility Guide](docs/claude-code-extensibility-guide.md) | All extension mechanisms: CLAUDE.md, skills, hooks, subagents, Agent Teams, MCP servers, and plugins |
 | [Claude Code Frontmatter Reference](docs/claude-code-frontmatter-reference.md) | YAML frontmatter syntax for configuring agents, skills, and commands in `.claude/` files |

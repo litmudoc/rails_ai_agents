@@ -84,6 +84,8 @@ def destroy # DELETE /resources/:id
 
 ## Authorization First
 
+> **MVP exception (this project, DECIDED):** docs/req/01.mvp.md ships without authentication or Pundit enforcement. Do not add `authenticate_user!`, `authorize`, or policy classes — leave `# TODO: authenticate_user!` / `# TODO: authorize` comments at the call sites, and skip the authentication/authorization checklist items below until auth is introduced.
+
 Always authorize before any action:
 ```ruby
 class RestaurantsController < ApplicationController

@@ -19,7 +19,7 @@ paths:
 
 ## Multi-Database Tests (timeseries / timeseries_cache)
 
-- The test environment defines `timeseries` and `timeseries_cache` entries (see docs/multi-db-config.md). `bin/rails db:test:prepare` creates and loads each database from its own structure.sql (`schema_format = :sql`), including the TimescaleDB extension, hypertables, and continuous aggregates — never hand-create these in specs.
+- The test environment defines `timeseries` and `timeseries_cache` entries (see docs/multi-db-config.md). These use `schema_dump: false`, so `RAILS_ENV=test bin/rails db:prepare` creates them and runs their migrations (TimescaleDB extension, hypertables, continuous aggregates) — never hand-create these in specs. The primary database loads from `db/schema.rb` (default :ruby format); rails_helper auto-recovers the schema-less databases when a test-schema reload purges them.
 - Rails transactional tests wrap every configured database connection, so `Candle` / `ActiveCandle` writes roll back between examples like primary-DB writes. If a spec must commit outside the wrapping transaction, delete from `candles` / `active_candles` explicitly in an `after` block.
 - Continuous-aggregate models (`Candle2m`…`Candle30m`) are readonly real-time aggregates (`materialized_only = false`): in specs, insert 1m rows into `candles` and query the aggregate model directly. Do not attempt to trigger refresh policies — TimescaleDB background workers do not run during tests.
 

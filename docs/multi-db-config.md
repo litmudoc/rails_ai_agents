@@ -119,15 +119,14 @@ inherits from `TimeseriesCacheRecord`. Everything else inherits from
 ## Schema format
 
 TimescaleDB objects (hypertables, continuous aggregates, retention/refresh
-policies) cannot be represented in `schema.rb`:
+policies) cannot be represented in a schema dump — neither `schema.rb` nor a
+plain `pg_dump` structure file restores them faithfully. The `timeseries` and
+`timeseries_cache` databases therefore set `schema_dump: false` in
+`database.yml`, and `db:prepare` rebuilds them by running their migrations.
 
-```ruby
-# config/application.rb
-config.active_record.schema_format = :sql
-```
-
-Each database dumps its own `structure.sql` (`db/timeseries_structure.sql`,
-etc. — Rails derives the filename from the connection name).
+Every other database keeps the default `:ruby` schema format: the primary
+database dumps `db/schema.rb`, and the Solid Queue/Cache/Cable databases load
+their gem-provided `db/*_schema.rb` files (which require `:ruby`).
 
 ## TimescaleDB bootstrap
 

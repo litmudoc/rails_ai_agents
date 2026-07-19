@@ -19,7 +19,7 @@ paths:
 
 ## Multi-database / TimescaleDB (see docs/multi-db-config.md)
 
-- This app uses `schema_format = :sql` — verify `db/structure.sql` / `db/timeseries_structure.sql` / `db/timeseries_cache_structure.sql` diffs, never `db/schema.rb`.
+- Primary DB uses the default :ruby schema format — verify `db/schema.rb` diffs. The `timeseries` / `timeseries_cache` databases have no schema dump at all (`schema_dump: false`); their state is defined solely by the migrations in their `*_migrate/` directories, which `db:prepare` (re)runs.
 - Migrations for the `timeseries` / `timeseries_cache` databases live in `db/timeseries_migrate/` and `db/timeseries_cache_migrate/` and use raw SQL (`execute`) with explicit `up`/`down` for hypertables, continuous aggregates, and retention/refresh policies — `change` cannot express these; explicit `up`/`down` is the convention there, not a violation of the reversibility rule.
 - No foreign keys in `timeseries` / `timeseries_cache` tables: they denormalize `exchange_code` and `symbol` as plain strings (cross-database FKs are impossible). Do not add `references ... foreign_key: true` there.
 - Unique indexes on hypertables must include the `time` partition column.
